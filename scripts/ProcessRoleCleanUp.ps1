@@ -38,7 +38,7 @@ function ValidateCsv {
         [object] $csv
     )
 
-    $requiredHeaders = "Account", "Role", "RoleArn"
+    $requiredHeaders = "Account", "RoleName", "RoleArn"
     $csvHeaders = $csv[0].PSObject.Properties.Name.Split()
 
     foreach ($header in $csvHeaders) {
@@ -58,7 +58,7 @@ function ProcessRoleCleanUp {
 
         $RoleArguments = @(
             $_.Account
-            $_.Role
+            $_.RoleName
             $_.RoleArn
         )
 
