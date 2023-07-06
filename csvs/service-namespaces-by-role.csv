@@ -1,7 +1,1 @@
 RoleName,ServiceNamespace
-test-biffy-CodeBuild-Role,ecr
-test-biffy-CodeBuild-Role,kms
-test-biffy-CodeBuild-Role,logs
-test-biffy-CodeBuild-Role,secretsmanager
-test-biffy-CodeBuild-Role,sqs
-test-biffy-CodeBuild-Role,ssm
