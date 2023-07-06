@@ -1,16 +1,14 @@
-import { CreatePolicyCommand, IAMClient } from "@aws-sdk/client-iam";
-import { base, ecr } from "./permissions.js";
-
-const client = new IAMClient({
-  region: "us-east-1"
-});
+import { CreatePolicyCommand } from "@aws-sdk/client-iam";
+import client from "services/client.js";
+import * as Permissions from "./permissions.js";
 
 export const createPolicy = (policyName: string) => {
 
-  base.Statement.push(ecr);
+  const policyDocument = Permissions.Root;
+  policyDocument.Statement.push(Permissions.ECR);
 
   const command = new CreatePolicyCommand({
-    PolicyDocument: JSON.stringify(base),
+    PolicyDocument: JSON.stringify(policyDocument),
     PolicyName: policyName,
   });
 

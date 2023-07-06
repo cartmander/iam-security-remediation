@@ -1,4 +1,4 @@
-export interface Base {
+export interface Root {
     Version: string;
     Statement: object[];
 }
@@ -10,12 +10,12 @@ export interface Action {
 }
   
 
-export const base: Base = {
+export const Root: Root = {
     "Version": "2012-10-17",
     "Statement": []
 }
 
-export const ecr: Action = {
+export const ECR: Action = {
     "Effect": "Allow",
     "Action": [
         "ecr:Batch*",
@@ -38,7 +38,7 @@ export const ecr: Action = {
     "Resource": "*"
 }
 
-export const kms: Action  = {
+export const KMS: Action  = {
     "Effect": "Allow",
     "Action": [
         "kms:CancelKeyDeletion",
@@ -78,7 +78,7 @@ export const kms: Action  = {
     "Resource": "*"
 }
 
-export const logs: Action = {
+export const Logs: Action = {
     "Effect": "Allow",
     "Action": [
         "cloudwatch:Delete*",
@@ -100,7 +100,7 @@ export const logs: Action = {
     "Resource": "*"
 }
 
-export const secretsmanager: Action = {
+export const SecretsManager: Action = {
     "Effect": "Allow",
     "Action": [
         "secretsmanager:CancelRotateSecret",
@@ -127,7 +127,7 @@ export const secretsmanager: Action = {
     "Resource": "*"
 }
 
-export const sqs: object = {
+export const SQS: object = {
     "Effect": "Allow",
     "Action": [
         "sqs:AddPermission",
@@ -151,7 +151,7 @@ export const sqs: object = {
     "Resource": "*"
 }
 
-export const ssm: Action = {
+export const SSM: Action = {
     "Effect": "Allow",
     "Action": [
         "ssm:AddTagsToResource",
