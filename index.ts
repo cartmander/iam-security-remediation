@@ -1,28 +1,20 @@
-import { IAMClient, paginateListPolicies } from "@aws-sdk/client-iam";
+import { CreatePolicyCommand, IAMClient } from "@aws-sdk/client-iam";
+import { base, ecr } from "./permissions.js";
 
 const client = new IAMClient({
   region: "us-east-1"
 });
 
-export const listLocalPolicies = async () => {
-  const paginator = paginateListPolicies(
-    { client, pageSize: 10 },
-    // List only customer managed policies.
-    { Scope: "Local" }
-  );
+export const createPolicy = (policyName: string) => {
 
-  console.log("IAM policies defined in your account:");
-  let policyCount = 0;
-  for await (const page of paginator) {
-    if (page.Policies) {
-      page.Policies.forEach((p) => {
-        console.log(`${p.PolicyName}`);
-        policyCount++;
-      });
-    }
-  }
-  console.log(`Found ${policyCount} policies.`);
-  console.log(JSON.stringify(paginator))
+  base.Statement.push(ecr);
+
+  const command = new CreatePolicyCommand({
+    PolicyDocument: JSON.stringify(base),
+    PolicyName: policyName,
+  });
+
+  return client.send(command);
 };
 
-await listLocalPolicies()
+createPolicy("test-policy");

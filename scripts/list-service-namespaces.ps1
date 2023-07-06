@@ -12,7 +12,7 @@ function ProcessData
     try
     {
         $record = "{0},{1}" -f $roleName, $serviceNamespace
-        $record | Add-Content -Path "..\.\results\service-namespaces-for-policy-creation.csv"
+        $record | Add-Content -Path "..\.\results\service-namespaces-by-role.csv"
     }
 
     catch
@@ -32,6 +32,11 @@ function ListServiceNamespaces {
     $serviceNamespaceList = foreach ($service in $services) {
         if ($null -ne $service.LastAuthenticated -and !$service.TrackedActionsLastAccessed) {
             ProcessData $service.ServiceNamespace
+        }
+
+        if ($service.TrackedActionsLastAccessed)
+        {
+            
         }
     }
 
@@ -53,7 +58,6 @@ function ListServicesLastAccessed {
 
 try {
     $servicesLastAccessed = ListServicesLastAccessed
-
     ListServiceNamespaces $servicesLastAccessed
 }
 
