@@ -2,10 +2,15 @@
   "name": "scripts",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "list": "cd scripts && pwsh -File ./get-service-namespaces-for-policy-creation.ps1 -ExecutionPolicy Unrestricted -NoProfile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-iam": "^3.359.0"
+  }
 }
