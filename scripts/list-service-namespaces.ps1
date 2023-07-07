@@ -12,7 +12,7 @@ function ProcessData
     try
     {
         $record = "{0},{1}" -f $roleName, $serviceNamespace
-        $record | Add-Content -Path "..\.\results\service-namespaces-by-role.csv"
+        $record | Add-Content -Path "..\.\csvs\service-namespace.csv"
     }
 
     catch

@@ -5,12 +5,14 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "list": "cd scripts && pwsh -File ./list-service-namespaces-for-policy-creation.ps1 -ExecutionPolicy Unrestricted -NoProfile",
+    "list": "cd scripts && pwsh -File ./list-service-namespaces.ps1 -ExecutionPolicy Unrestricted -NoProfile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-iam": "^3.359.0"
+    "@aws-sdk/client-iam": "^3.359.0",
+    "@types/node": "^20.4.0",
+    "csv-parse": "^5.4.0"
   }
 }

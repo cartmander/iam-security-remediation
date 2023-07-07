@@ -1,21 +1,11 @@
-export interface Root {
-    Version: string;
-    Statement: object[];
-}
-
-export interface Action {
-    Effect: string;
-    Action: string | string[],
-    Resource: string | string[]
-}
+import { BaseDocument, ActionDocument } from "interfaces.js";
   
-
-export const Root: Root = {
+export const Root: BaseDocument = {
     "Version": "2012-10-17",
     "Statement": []
 }
 
-export const ECR: Action = {
+export const ECR: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "ecr:Batch*",
@@ -38,7 +28,7 @@ export const ECR: Action = {
     "Resource": "*"
 }
 
-export const KMS: Action  = {
+export const KMS: ActionDocument  = {
     "Effect": "Allow",
     "Action": [
         "kms:CancelKeyDeletion",
@@ -78,7 +68,7 @@ export const KMS: Action  = {
     "Resource": "*"
 }
 
-export const Logs: Action = {
+export const Logs: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "cloudwatch:Delete*",
@@ -100,7 +90,7 @@ export const Logs: Action = {
     "Resource": "*"
 }
 
-export const SecretsManager: Action = {
+export const SecretsManager: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "secretsmanager:CancelRotateSecret",
@@ -127,7 +117,7 @@ export const SecretsManager: Action = {
     "Resource": "*"
 }
 
-export const SQS: object = {
+export const SQS: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "sqs:AddPermission",
@@ -151,7 +141,7 @@ export const SQS: object = {
     "Resource": "*"
 }
 
-export const SSM: Action = {
+export const SSM: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "ssm:AddTagsToResource",
