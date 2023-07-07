@@ -61,6 +61,4 @@ try {
     ListServiceNamespaces $servicesLastAccessed
 }
 
-catch {
-
-}
+catch {}
