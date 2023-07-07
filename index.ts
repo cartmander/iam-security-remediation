@@ -4,12 +4,9 @@ import * as Permissions from "./permissions.js";
 import * as fs from "fs";
 import * as path from "path";
 import { parse } from "csv-parse";
-import { ActionDocument, BaseDocument } from "interfaces.js";
+import { BaseDocument } from "interfaces.js";
 
 export const createPolicy = (policyName: string, policyDocument: any) => {
-  //const policyDocument = Permissions.Root;
-  //policyDocument.Statement.push(Permissions.ECR);
-
   const command = new CreatePolicyCommand({
     PolicyDocument: JSON.stringify(policyDocument),
     PolicyName: policyName,
@@ -18,10 +15,33 @@ export const createPolicy = (policyName: string, policyDocument: any) => {
   return client.send(command);
 };
 
-export const buildPolicyDocument = (baseDocument: BaseDocument, serviceNamespace: ActionDocument) =>
+export const buildPolicyDocument = (baseDocument: BaseDocument, serviceNamespace: string) =>
 {
-  baseDocument.Statement.push(serviceNamespace);
-  return baseDocument;
+  switch (serviceNamespace) {
+    case "ecr":
+      baseDocument.Statement.push(Permissions.ECR);
+      break;
+    case "kms":
+      baseDocument.Statement.push(Permissions.KMS);
+      break;
+    case "logs":
+      baseDocument.Statement.push(Permissions.Logs);
+      break;
+    case "secretsmanager":
+      baseDocument.Statement.push(Permissions.SecretsManager);
+      break;
+    case "sqs":
+      baseDocument.Statement.push(Permissions.SQS);
+      break;
+    case "ssm":
+      baseDocument.Statement.push(Permissions.SSM);
+      break;
+    default:
+      console.log("error");
+      break;
+    }
+
+    return baseDocument;
 }
 
 export const main = () => {
@@ -36,22 +56,15 @@ export const main = () => {
   };
 
   const processCsv = async (error: any, csvRecords: any) => {
-    if (error) {
-      console.error(error);
-    }
-    console.log("Result:", csvRecords);
-
     const baseDocument: BaseDocument = Permissions.Root;
-    let document;
+    let policyDocument;
 
     for (let record in csvRecords) {
       const { ServiceNamespace } = csvRecords[record];
-
-      document = buildPolicyDocument(baseDocument, Permissions.ECR);
-      
+      policyDocument = buildPolicyDocument(baseDocument, ServiceNamespace);
     }
 
-    console.log(JSON.stringify(document));
+    createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
   };
 
   parse(csvContent, csvOptions, processCsv);
