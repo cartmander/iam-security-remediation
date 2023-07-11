@@ -1,11 +1,11 @@
-import { BaseDocument, ActionDocument } from "interfaces.js";
+import { BaseDocument, ActionDocument } from "./../interfaces/PolicyDocument";
   
-export const Root: BaseDocument = {
+export const RootDocument: BaseDocument = {
     "Version": "2012-10-17",
     "Statement": []
 }
 
-export const ECR: ActionDocument = {
+export const ECRFullDocument: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "ecr:Batch*",
@@ -28,7 +28,7 @@ export const ECR: ActionDocument = {
     "Resource": "*"
 }
 
-export const KMS: ActionDocument  = {
+export const KMSFullDocument: ActionDocument  = {
     "Effect": "Allow",
     "Action": [
         "kms:CancelKeyDeletion",
@@ -68,7 +68,7 @@ export const KMS: ActionDocument  = {
     "Resource": "*"
 }
 
-export const Logs: ActionDocument = {
+export const LogsFullDocument: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "logs:AssociateKmsKey",
@@ -95,7 +95,7 @@ export const Logs: ActionDocument = {
     "Resource": "*"
 }
 
-export const SecretsManager: ActionDocument = {
+export const SecretsManagerFullDocument: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "secretsmanager:CancelRotateSecret",
@@ -122,7 +122,7 @@ export const SecretsManager: ActionDocument = {
     "Resource": "*"
 }
 
-export const SQS: ActionDocument = {
+export const SQSFullDocument: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "sqs:AddPermission",
@@ -146,7 +146,7 @@ export const SQS: ActionDocument = {
     "Resource": "*"
 }
 
-export const SSM: ActionDocument = {
+export const SSMFullDocument: ActionDocument = {
     "Effect": "Allow",
     "Action": [
         "ssm:AddTagsToResource",

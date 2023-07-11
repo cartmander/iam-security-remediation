@@ -30,13 +30,8 @@ function ListServiceNamespaces {
     $services = $serviceLastAccessedDetails.ServicesLastAccessed
 
     $serviceNamespaceList = foreach ($service in $services) {
-        if ($null -ne $service.LastAuthenticated -and !$service.TrackedActionsLastAccessed) {
+        if ($null -ne $service.LastAuthenticated -or ($service.TrackedActionsLastAccessed -and $service.TotalAuthenticatedEntities -ne 0 )) {
             ProcessData $service.ServiceNamespace
-        }
-
-        if ($service.TrackedActionsLastAccessed)
-        {
-            
         }
     }
 
@@ -45,6 +40,9 @@ function ListServiceNamespaces {
 
 function ListServicesLastAccessed {
     $jobId = aws iam generate-service-last-accessed-details --arn $roleArn --granularity ACTION_LEVEL | ConvertFrom-Json
+    
+    Write-Host $jobId
+    
     $serviceLastAccessedDetails = aws iam get-service-last-accessed-details --job-id $jobId.JobId | ConvertFrom-Json
 
     while ($serviceLastAccessedDetails.JobStatus -eq "IN_PROGRESS") {
@@ -58,6 +56,9 @@ function ListServicesLastAccessed {
 
 try {
     $servicesLastAccessed = ListServicesLastAccessed
+
+    $servicesLastAccessed | ConvertTo-Json > test.json
+
     ListServiceNamespaces $servicesLastAccessed
 }
 

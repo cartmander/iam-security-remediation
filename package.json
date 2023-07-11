@@ -5,7 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "list": "cd scripts && pwsh -File ./list-service-namespaces.ps1 -ExecutionPolicy Unrestricted -NoProfile",
+    "pwsh": "cd scripts && pwsh -File ./list-service-namespaces.ps1 -ExecutionPolicy Unrestricted -NoProfile",
+    "build": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
