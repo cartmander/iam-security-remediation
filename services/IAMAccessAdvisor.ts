@@ -43,8 +43,7 @@ export const listServiceNamespaces = async (services: ServiceLastAccessed[]) =>
 {
   for (let i=0; i < services.length; i++)
   {
-    if (services[i].LastAuthenticated != null || 
-      (services[i].TrackedActionsLastAccessed && services[i].TotalAuthenticatedEntities != 0))
+    if (services[i].LastAuthenticated != null && services[i].TotalAuthenticatedEntities != 0)
     {
       console.log(services[i].ServiceNamespace);
     }

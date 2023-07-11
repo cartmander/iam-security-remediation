@@ -1,9 +1,9 @@
-export interface BaseDocument {
+export interface BaseIAMDocument {
     Version: string;
-    Statement: object[];
+    Statement: IAMStatement[];
 }
 
-export interface ActionDocument {
+export interface IAMStatement {
     Effect: string;
     Action: string | string[],
     Resource: string | string[]
