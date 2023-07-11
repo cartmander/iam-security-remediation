@@ -1,4 +1,5 @@
-import { getServiceLastAccessedDetails } from "./services/ServiceLastAccessedDetails.js";
+import { ServiceLastAccessed } from "@aws-sdk/client-iam";
+import { getServiceLastAccessedDetails, listServiceNamespaces } from "./services/ServiceLastAccessedDetails.js";
 // export const createPolicy = (policyName: string, policyDocument: any) => {
 //   const command = new CreatePolicyCommand({
 //     PolicyDocument: JSON.stringify(policyDocument),
@@ -68,4 +69,6 @@ const response = getServiceLastAccessedDetails({
   granularity: "ACTION_LEVEL"
 });
 
-console.log(JSON.stringify((await response).ServicesLastAccessed));
+const services = (await response).ServicesLastAccessed;
+
+listServiceNamespaces(services as ServiceLastAccessed[])

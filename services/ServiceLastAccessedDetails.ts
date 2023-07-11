@@ -1,4 +1,4 @@
-import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput } from "@aws-sdk/client-iam";
+import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, GetServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed } from "@aws-sdk/client-iam";
 import { ServiceLastAccessedDetails } from "../interfaces/ServiceLastAccessed.js";
 import { client } from "./IAMClient.js";
 
@@ -35,6 +35,18 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }:  Servi
   {
     response = await client.send(command);
   }
-  
+
   return response;
+}
+
+export const listServiceNamespaces = async (services: ServiceLastAccessed[]) =>
+{
+  for (let i=0; i < services.length; i++)
+  {
+    if (services[i].LastAuthenticated != null || 
+      (services[i].TrackedActionsLastAccessed && services[i].TotalAuthenticatedEntities != 0))
+    {
+      console.log(services[i].ServiceNamespace);
+    }
+  }
 }
