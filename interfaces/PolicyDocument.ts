@@ -5,6 +5,6 @@ export interface BaseIAMDocument {
 
 export interface IAMStatement {
     Effect: string;
-    Action: string | string[];
-    Resource: string | string[];
+    Action: string[];
+    Resource: string;
 }

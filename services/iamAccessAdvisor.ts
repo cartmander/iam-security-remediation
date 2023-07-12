@@ -1,6 +1,8 @@
 import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed } from "@aws-sdk/client-iam";
 import { ServiceLastAccessedDetails } from "../interfaces/ServiceLastAccessed.js";
 import { client } from "./iamClient.js";
+import path from "path";
+import fs from "fs";
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> =>
 {
@@ -30,7 +32,7 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-export const getServiceLastAccessedDetails = async ({ arn, granularity }:  ServiceLastAccessedDetails) =>
+export const getServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails) =>
 {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
     arn: arn,
@@ -77,4 +79,14 @@ export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[])
   listOfServiceNamespacesAndActions = listOfServiceNamespacesAndActions.concat(listofServiceNameSpaces);
 
   return listOfServiceNamespacesAndActions as string[];
+}
+
+export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) =>
+{
+  const csvFilePath = path.resolve('csvs/iam-service-namespaces-and-actions.csv')
+
+  for (let i = 0; i < serviceNamespacesAndActions.length; i ++)
+  {
+    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\r\n`);
+  }
 }
