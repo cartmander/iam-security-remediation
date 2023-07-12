@@ -1,6 +1,6 @@
-import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, GetServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed } from "@aws-sdk/client-iam";
+import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed } from "@aws-sdk/client-iam";
 import { ServiceLastAccessedDetails } from "../interfaces/ServiceLastAccessed.js";
-import { client } from "./IAMClient.js";
+import { client } from "./iamClient.js";
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> =>
 {
@@ -15,6 +15,21 @@ const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceL
   return response;
 }
 
+const listActions = (listOfActions: string[], service: string, actions: TrackedActionLastAccessed[]): string[] =>
+{
+  for (let i = 0; i < actions.length; i ++)
+  {
+    const action = actions[i];
+
+    if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null)
+    {
+      listOfActions.push(`${service}:${ action.ActionName }`);
+    }
+  }
+
+  return listOfActions;
+}
+
 export const getServiceLastAccessedDetails = async ({ arn, granularity }:  ServiceLastAccessedDetails) =>
 {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
@@ -25,8 +40,6 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }:  Servi
   const serviceDetailsInput = {
     JobId: (await serviceDetailsResponse).JobId
   }
-
-  console.log(serviceDetailsInput.JobId);
 
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
   let response = await client.send(command);
@@ -39,13 +52,29 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }:  Servi
   return response;
 }
 
-export const listServiceNamespaces = async (services: ServiceLastAccessed[]) =>
+export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[]): string[] =>
 {
-  for (let i=0; i < services.length; i++)
+  let listOfServiceNamespacesAndActions: string[] = [];
+  let listofServiceNameSpaces: string[] = [];
+  let listOfActions: string[] = [];
+  let actions: string[] = [];
+
+  for (let i = 0; i < services.length; i ++)
   {
-    if (services[i].LastAuthenticated != null && services[i].TotalAuthenticatedEntities != 0)
+    const service = services[i];
+
+    if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0)
     {
-      console.log(services[i].ServiceNamespace);
+      listofServiceNameSpaces.push(service.ServiceNamespace as string);
+    }
+
+    if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0)
+    {
+      listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
     }
   }
+
+  listOfServiceNamespacesAndActions = listOfServiceNamespacesAndActions.concat(listofServiceNameSpaces);
+
+  return listOfServiceNamespacesAndActions as string[];
 }

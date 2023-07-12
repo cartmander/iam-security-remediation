@@ -1,4 +1,4 @@
 export interface ServiceLastAccessedDetails {
-    arn: string, 
-    granularity: string
+    arn: string;
+    granularity: string;
 }

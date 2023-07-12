@@ -1,12 +1,12 @@
 import { CreatePolicyCommand } from "@aws-sdk/client-iam";
-import { client } from "./IAMClient.js";
-import path from "path";
-import fs from "fs";
-import { parse } from "csv-parse";
+import { client } from "./iamClient.js";
 import { BaseIAMDocument, IAMStatement } from "interfaces/PolicyDocument.js";
 import { ecrStatements, kmsStatements, logsStatements, 
   secretsManagerStatements, sqsStatements, ssmStatements 
 } from "models/Permissions.js";
+import path from "path";
+import fs from "fs";
+import { parse } from "csv-parse";
 
 const rootDocument: BaseIAMDocument = {
   "Version": "2012-10-17",
@@ -48,18 +48,29 @@ const buildPolicyDocument = (document: BaseIAMDocument, serviceNamespace: string
     return rootDocument;
 }
 
-const createPolicy = (policyName: string, policyDocument: any) => {
+const createPolicy = async (policyName: string, policyDocument: any) => {
   const command = new CreatePolicyCommand({
     PolicyDocument: JSON.stringify(policyDocument),
     PolicyName: policyName
   });
 
-  return client.send(command);
+  return await client.send(command);
 };
 
-export const processPolicyCreation = () => {
+const processCsv = async (error: any, csvRecords: any) => {
+  let policyDocument;
+
+  for (let record in csvRecords) {
+    const { ServiceNamespaceOrAction } = csvRecords[record];
+    policyDocument = buildPolicyDocument(rootDocument, ServiceNamespaceOrAction);
+  }
+
+  await createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
+};
+
+export const processPolicyCreation = async (csvPath: string) => {
   const headers = ["RoleName", "ServiceNamespace"];
-  const csvFilePath = path.resolve("csvs/service-namespace.csv");
+  const csvFilePath = path.resolve(csvPath);
   const csvContent = fs.readFileSync(csvFilePath);
 
   const csvOptions = {
@@ -68,16 +79,5 @@ export const processPolicyCreation = () => {
     from_line: 2
   };
 
-  const processCsv = async (error: any, csvRecords: any) => {
-    let policyDocument;
-
-    for (let record in csvRecords) {
-      const { ServiceNamespace } = csvRecords[record];
-      policyDocument = buildPolicyDocument(rootDocument, ServiceNamespace);
-    }
-
-    createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
-  };
-
-  parse(csvContent, csvOptions, processCsv);
+  await parse(csvContent, csvOptions, processCsv);
 }

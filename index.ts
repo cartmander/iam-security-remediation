@@ -1,5 +1,5 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
-import { getServiceLastAccessedDetails, listServiceNamespaces } from "./services/IAMAccessAdvisor.js";
+import { getServiceLastAccessedDetails, listServiceNamespacesAndActions } from "./services/iamAccessAdvisor.js";
 
 const response = getServiceLastAccessedDetails({ 
   arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 
@@ -8,4 +8,5 @@ const response = getServiceLastAccessedDetails({
 
 const services = (await response).ServicesLastAccessed;
 
-listServiceNamespaces(services as ServiceLastAccessed[])
+const listOfServiceNamespacesAndActions = listServiceNamespacesAndActions(services as ServiceLastAccessed[]);
+console.log(listOfServiceNamespacesAndActions);
