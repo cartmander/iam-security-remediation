@@ -1,6 +1,6 @@
 import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed } from "@aws-sdk/client-iam";
 import { ServiceLastAccessedDetails } from "../interfaces/ServiceLastAccessed.js";
-import { client } from "./iamClient.js";
+import { client } from "./eiamClient.js";
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> =>
 {
