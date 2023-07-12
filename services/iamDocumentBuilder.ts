@@ -1,5 +1,5 @@
 import { CreatePolicyCommand } from "@aws-sdk/client-iam";
-import { client } from "./eiamClient.js";
+import { client } from "./iamClient.js";
 import { BaseIAMDocument, IAMStatement } from "interfaces/PolicyDocument.js";
 import { ecrStatements, kmsStatements, logsStatements, 
   secretsManagerStatements, sqsStatements, ssmStatements 
