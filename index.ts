@@ -3,8 +3,7 @@ import { getServiceLastAccessedDetails, listServiceNamespacesAndActions, populat
 import { processPolicyCreation } from "./services/iamDocumentBuilder.js";
 
 
-const main = async () =>
-{
+const main = async () => {
   const response = getServiceLastAccessedDetails({ 
     arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 
     granularity: "ACTION_LEVEL"

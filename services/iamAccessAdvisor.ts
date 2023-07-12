@@ -17,14 +17,12 @@ const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceL
   return response;
 }
 
-const listActions = (listOfActions: string[], service: string, actions: TrackedActionLastAccessed[]): string[] =>
-{
+const listActions = (listOfActions: string[], service: string, actions: TrackedActionLastAccessed[]): string[] => {
   for (let i = 0; i < actions.length; i ++)
   {
     const action = actions[i];
 
-    if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null)
-    {
+    if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null) {
       listOfActions.push(`${service}:${ action.ActionName }`);
     }
   }
@@ -32,8 +30,7 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-export const getServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails) =>
-{
+export const getServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails) => {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
     arn: arn,
     granularity: granularity 
@@ -54,8 +51,7 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Servic
   return response;
 }
 
-export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[]): string[] =>
-{
+export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[]): string[] => {
   let listOfServiceNamespacesAndActions: string[] = [];
   let listofServiceNameSpaces: string[] = [];
   let listOfActions: string[] = [];
@@ -65,13 +61,11 @@ export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[])
   {
     const service = services[i];
 
-    if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0)
-    {
+    if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0) {
       listofServiceNameSpaces.push(service.ServiceNamespace as string);
     }
 
-    if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0)
-    {
+    if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
       listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
     }
   }
@@ -81,12 +75,10 @@ export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[])
   return listOfServiceNamespacesAndActions as string[];
 }
 
-export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) =>
-{
+export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
   const csvFilePath = path.resolve('csvs/iam-service-namespaces-and-actions.csv')
 
-  for (let i = 0; i < serviceNamespacesAndActions.length; i ++)
-  {
+  for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
     fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\r\n`);
   }
 }

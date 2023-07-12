@@ -65,13 +65,11 @@ const processCsv = async (error: any, csvRecords: any) => {
 
     const serviceNamespaceOrAction = ServiceNamespacesAndActions as string;
 
-    if(serviceNamespaceOrAction.includes(":"))
-    {
+    if(serviceNamespaceOrAction.includes(":")) {
       customStatements.Action.push(serviceNamespaceOrAction);
     }
     
-    else
-    {
+    else {
       policyDocument = buildPolicyDocument(rootDocument, serviceNamespaceOrAction);
     }
   }
