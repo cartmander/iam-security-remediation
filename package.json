@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && node dist/index.js",
-    "file": "tsc && node dist/test.js",
+    "file": "tsc && node dist/services/explicitPolicyBuilder.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

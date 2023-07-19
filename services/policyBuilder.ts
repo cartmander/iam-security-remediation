@@ -1,12 +1,10 @@
 import { CreatePolicyCommand } from "@aws-sdk/client-iam";
 import { client } from "../client.js";
 import { BaseIAMDocument, IAMStatement } from "../interfaces/PolicyDocument.js";
-import { ecrStatements, kmsStatements, logsStatements, 
-  secretsManagerStatements, sqsStatements, ssmStatements 
-} from "../action.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
+import { buildExplicitActions } from "./explicitActionsBuilder.js";
 
 const rootDocument: BaseIAMDocument = {
   "Version": "2012-10-17",
@@ -19,33 +17,12 @@ const customStatements: IAMStatement = {
   "Resource": "*"
 }
 
-const buildPolicyDocument = (document: BaseIAMDocument, serviceNamespace: string) =>
+const buildExplicitActionsStatement = (document: BaseIAMDocument, serviceNamespace: string) =>
 {
-  switch (serviceNamespace) {
-    case "ecr":
-      document.Statement.push(ecrStatements);
-      break;
-    case "kms":
-      document.Statement.push(kmsStatements);
-      break;
-    case "logs":
-      document.Statement.push(logsStatements);
-      break;
-    case "secretsmanager":
-      document.Statement.push(secretsManagerStatements);
-      break;
-    case "sqs":
-      document.Statement.push(sqsStatements);
-      break;
-    case "ssm":
-      document.Statement.push(ssmStatements);
-      break;
-    default:
-      console.log("error");
-      break;
-    }
+  const explicitActionStatement = buildExplicitActions(serviceNamespace);
+  document.Statement.push(explicitActionStatement);
 
-    return document;
+  return document;
 }
 
 const createPolicy = async (policyName: string, policyDocument: any) => {
@@ -57,7 +34,7 @@ const createPolicy = async (policyName: string, policyDocument: any) => {
   return await client.send(command);
 };
 
-const processCsv = async (error: any, csvRecords: any) => {
+const processIAMCsv = async (error: any, csvRecords: any) => {
   let policyDocument;
 
   for (let record in csvRecords) {
@@ -70,7 +47,7 @@ const processCsv = async (error: any, csvRecords: any) => {
     }
     
     else {
-      policyDocument = buildPolicyDocument(rootDocument, serviceNamespaceOrAction);
+      policyDocument = buildExplicitActionsStatement(rootDocument, serviceNamespaceOrAction);
     }
   }
 
@@ -80,7 +57,7 @@ const processCsv = async (error: any, csvRecords: any) => {
   //await createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
 }
 
-export const processPolicyCreation = async (csvPath: string) => {
+export const processPolicyBuilder = async (csvPath: string) => {
   const headers = ["RoleName", "ServiceNamespacesAndActions"];
   const csvFilePath = path.resolve(csvPath);
   const csvContent = fs.readFileSync(csvFilePath);
@@ -91,5 +68,5 @@ export const processPolicyCreation = async (csvPath: string) => {
     from_line: 2
   };
 
-  await parse(csvContent, csvOptions, processCsv);
+  await parse(csvContent, csvOptions, processIAMCsv);
 }

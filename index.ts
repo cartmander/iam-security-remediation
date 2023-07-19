@@ -1,6 +1,6 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
 import { getServiceLastAccessedDetails, listServiceNamespacesAndActions, populateIamCsv } from "./services/accessAdvisor.js";
-import { processPolicyCreation } from "./services/documentBuilder.js";
+import { processPolicyBuilder } from "./services/policyBuilder.js";
 
 
 const main = async () => {
@@ -15,7 +15,7 @@ const main = async () => {
   console.log(listOfServiceNamespacesAndActions);
 
   populateIamCsv("test-biffy-CodeBuild-Role", listOfServiceNamespacesAndActions);
-  processPolicyCreation("csvs/iam-service-namespaces-and-actions.csv");
+  processPolicyBuilder("csvs/iam-service-namespaces-and-actions.csv");
 }
 
 main();
