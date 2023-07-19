@@ -4,8 +4,7 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> =>
-{ 
+const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
     Arn: arn,
     Granularity: granularity,

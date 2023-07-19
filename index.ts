@@ -2,7 +2,6 @@ import { ServiceLastAccessed } from "@aws-sdk/client-iam";
 import { getServiceLastAccessedDetails, listServiceNamespacesAndActions, populateIAMCsv } from "./services/accessAdvisor.js";
 import { processPolicyBuilder } from "./services/policyBuilder.js";
 
-
 const main = async () => {
   const response = getServiceLastAccessedDetails({ 
     arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 

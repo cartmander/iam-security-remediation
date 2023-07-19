@@ -1,65 +1,87 @@
-import { CreatePolicyCommand } from "@aws-sdk/client-iam";
+import { CreatePolicyCommand, CreatePolicyVersionCommand, GetPolicyCommand } from "@aws-sdk/client-iam";
 import { client } from "../client.js";
-import { BaseIAMDocument, IAMStatement } from "../interfaces/PolicyDocument.js";
+import { rootDocument, customStatements, buildExplicitActions } from "../document.js";
+import { BaseIAMDocument } from "../interfaces/PolicyDocument.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-const rootDocument: BaseIAMDocument = {
-  "Version": "2012-10-17",
-  "Statement": []
-}
-
-const customStatements: IAMStatement = {
-  "Effect": "Allow",
-  "Action": [],
-  "Resource": "*"
-}
-
-const buildExplicitActions = (serviceName: string) => {
-
-  const actions: IAMStatement = {
-      "Effect": "Allow",
-      "Action": [
-          `${serviceName}:Create*`,
-          `${serviceName}:Read*`,
-          `${serviceName}:Update*`,
-          `${serviceName}:Delete*`,
-          `${serviceName}:Get*`,
-          `${serviceName}:List*`,
-          `${serviceName}:Describe*`,
-          `${serviceName}:Untag*`,
-          `${serviceName}:Tag*`
-      ],
-      "Resource": "*"
+const isPolicyExisting = async (policyName: string) =>
+{
+  let response;
+  const getPolicyCommandInput = {
+    PolicyArn: `arn:aws:iam::539383487878:policy/${policyName}`
   }
 
-  return actions;
+  try {
+    const command = new GetPolicyCommand(getPolicyCommandInput);
+    response = await client.send(command);
+  }
+
+  catch {
+  }
+
+  return response;
 }
 
-const buildExplicitActionsStatement = (document: BaseIAMDocument, serviceNamespace: string) =>
-{
-  const explicitActionStatement = buildExplicitActions(serviceNamespace);
-  document.Statement.push(explicitActionStatement);
-
-  return document;
-}
-
-const createPolicy = async (policyName: string, policyDocument: any) => {
-  const command = new CreatePolicyCommand({
+const createPolicyVersion = async (policyDocument: BaseIAMDocument, policyName: string) => {
+  const createPolicyVersionInput = {
+    PolicyArn: `arn:aws:iam::539383487878:policy/${policyName}`,
     PolicyDocument: JSON.stringify(policyDocument),
-    PolicyName: policyName
-  });
+    SetAsDefault: true
+  };
 
-  return await client.send(command);
-};
+  const command = new CreatePolicyVersionCommand(createPolicyVersionInput);
+  const response = await client.send(command);
+
+  return response;
+}
+
+const createPolicy = async (policyDocument: BaseIAMDocument, policyName: string) => {
+  const createPolicyCommandInput = {
+    PolicyDocument: JSON.stringify(policyDocument),
+    PolicyName: policyName,
+    Tags: [
+      {
+        Key: "REPOSITORY",
+        Value: "ubif-iam-role-cdk-access-advisor"
+      }
+    ]
+  }
+  
+  const command = new CreatePolicyCommand(createPolicyCommandInput);
+  const response = await client.send(command);
+  
+  return response;
+}
+
+const createPolicyOrPolicyVersion = async (policyDocument: BaseIAMDocument, policyName: string) => {
+  const policyExistResponse = await isPolicyExisting(policyName);
+
+  if (!policyExistResponse) {
+    await createPolicy(policyDocument as BaseIAMDocument, policyName);
+  }
+
+  else {
+    await createPolicyVersion(policyDocument as BaseIAMDocument, policyName);
+  }
+}
+
+const buildExplicitActionsStatement = (policyDocument: BaseIAMDocument, serviceNamespace: string) => {
+  const explicitActionStatement = buildExplicitActions(serviceNamespace);
+  policyDocument.Statement.push(explicitActionStatement);
+
+  return policyDocument;
+}
 
 const processIAMCsv = async (error: any, csvRecords: any) => {
   let policyDocument;
+  let roleName;
 
   for (let record in csvRecords) {
-    const { ServiceNamespacesAndActions } = csvRecords[record];
+    const { RoleName, ServiceNamespacesAndActions } = csvRecords[record];
 
+    roleName = RoleName;
     const serviceNamespaceOrAction = ServiceNamespacesAndActions as string;
 
     if(serviceNamespaceOrAction.includes(":")) {
@@ -74,7 +96,7 @@ const processIAMCsv = async (error: any, csvRecords: any) => {
   policyDocument?.Statement.push(customStatements);
   console.log(JSON.stringify(policyDocument));
 
-  //await createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
+  createPolicyOrPolicyVersion(policyDocument as BaseIAMDocument, `${roleName}-AccessAdvisorAutomation`);
 }
 
 export const processPolicyBuilder = async (csvPath: string) => {
