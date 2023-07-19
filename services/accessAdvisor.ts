@@ -75,7 +75,7 @@ export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[])
   return listOfServiceNamespacesAndActions as string[];
 }
 
-export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
+export const populateIAMCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
   const csvFilePath = path.resolve('csvs/iam-service-namespaces-and-actions.csv')
 
   for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
