@@ -1,17 +1,1 @@
 RoleName,ServiceNamespacesAndActions
-test-biffy-CodeBuild-Role,ec2:CreateNetworkInterface
-test-biffy-CodeBuild-Role,ec2:CreateNetworkInterfacePermission
-test-biffy-CodeBuild-Role,ec2:DeleteNetworkInterface
-test-biffy-CodeBuild-Role,ec2:DescribeDhcpOptions
-test-biffy-CodeBuild-Role,ec2:DescribeNetworkInterfaces
-test-biffy-CodeBuild-Role,ec2:DescribeSecurityGroups
-test-biffy-CodeBuild-Role,ec2:DescribeSubnets
-test-biffy-CodeBuild-Role,ec2:DescribeVpcs
-test-biffy-CodeBuild-Role,s3:GetBucketAcl
-test-biffy-CodeBuild-Role,s3:GetBucketLocation
-test-biffy-CodeBuild-Role,ecr
-test-biffy-CodeBuild-Role,kms
-test-biffy-CodeBuild-Role,logs
-test-biffy-CodeBuild-Role,secretsmanager
-test-biffy-CodeBuild-Role,sqs
-test-biffy-CodeBuild-Role,ssm

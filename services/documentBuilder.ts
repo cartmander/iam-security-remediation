@@ -3,7 +3,7 @@ import { client } from "../client.js";
 import { BaseIAMDocument, IAMStatement } from "../interfaces/PolicyDocument.js";
 import { ecrStatements, kmsStatements, logsStatements, 
   secretsManagerStatements, sqsStatements, ssmStatements 
-} from "../models/Permissions.js";
+} from "../action.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";

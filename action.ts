@@ -1,4 +1,4 @@
-import { IAMStatement } from "./../interfaces/PolicyDocument";
+import { IAMStatement } from "./interfaces/PolicyDocument";
 
 export const ecrStatements: IAMStatement = {
     "Effect": "Allow",
