@@ -1,6 +1,6 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
-import { getServiceLastAccessedDetails, listServiceNamespacesAndActions, populateIamCsv } from "./services/iamAccessAdvisor.js";
-import { processPolicyCreation } from "./services/iamDocumentBuilder.js";
+import { getServiceLastAccessedDetails, listServiceNamespacesAndActions, populateIamCsv } from "./services/accessAdvisor.js";
+import { processPolicyCreation } from "./services/documentBuilder.js";
 
 
 const main = async () => {

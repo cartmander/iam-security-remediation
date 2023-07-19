@@ -1,5 +1,5 @@
 import { CreatePolicyCommand } from "@aws-sdk/client-iam";
-import { client } from "./iamClient.js";
+import { client } from "../client.js";
 import { BaseIAMDocument, IAMStatement } from "../interfaces/PolicyDocument.js";
 import { ecrStatements, kmsStatements, logsStatements, 
   secretsManagerStatements, sqsStatements, ssmStatements 
@@ -77,8 +77,8 @@ const processCsv = async (error: any, csvRecords: any) => {
   policyDocument?.Statement.push(customStatements);
   console.log(JSON.stringify(policyDocument));
 
-  await createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
-};
+  //await createPolicy("test-biffy-CodeBuild-Role-AutomationPolicy", policyDocument)
+}
 
 export const processPolicyCreation = async (csvPath: string) => {
   const headers = ["RoleName", "ServiceNamespacesAndActions"];
