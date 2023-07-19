@@ -4,7 +4,6 @@ import { BaseIAMDocument, IAMStatement } from "../interfaces/PolicyDocument.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
-import { buildExplicitActions } from "./explicitActionsBuilder.js";
 
 const rootDocument: BaseIAMDocument = {
   "Version": "2012-10-17",
@@ -15,6 +14,27 @@ const customStatements: IAMStatement = {
   "Effect": "Allow",
   "Action": [],
   "Resource": "*"
+}
+
+const buildExplicitActions = (serviceName: string) => {
+
+  const actions: IAMStatement = {
+      "Effect": "Allow",
+      "Action": [
+          `${serviceName}:Create*`,
+          `${serviceName}:Read*`,
+          `${serviceName}:Update*`,
+          `${serviceName}:Delete*`,
+          `${serviceName}:Get*`,
+          `${serviceName}:List*`,
+          `${serviceName}:Describe*`,
+          `${serviceName}:Untag*`,
+          `${serviceName}:Tag*`
+      ],
+      "Resource": "*"
+  }
+
+  return actions;
 }
 
 const buildExplicitActionsStatement = (document: BaseIAMDocument, serviceNamespace: string) =>
