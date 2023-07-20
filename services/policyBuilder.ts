@@ -3,14 +3,14 @@ import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-const generateBaseDocument = (): BasePolicy =>  {
+const generateBasePolicy = (): BasePolicy =>  {
   return {
       Version: "2012-10-17",
       Statement: []
   }
 }
 
-const generateBaseStatement = (): Statement => {
+const generateStatement = (): Statement => {
   return {
       Effect: "Allow",
       Action: [],
@@ -50,8 +50,8 @@ const processIAMCsv = async (error: any, csvRecords: any) => {
     const { ServiceNamespacesAndActions } = csvRecords[record];
     const serviceNamespaceOrAction = ServiceNamespacesAndActions as string;
 
-    let servicePolicyDocument = generateBaseDocument();
-    let statement = generateBaseStatement();
+    let servicePolicyDocument = generateBasePolicy();
+    let statement = generateStatement();
 
     if(!serviceNamespaceOrAction.includes(":")) {
       servicePolicyDocument = buildExplicitActionsStatement(servicePolicyDocument, serviceNamespaceOrAction);
