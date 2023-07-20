@@ -1,7 +1,49 @@
-import { generateBaseDocument, generateBaseStatement, buildExplicitActionsStatement } from "./documentBuilder.js";
+import { BasePolicy, Statement } from "interfaces/Policy";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
+
+const generateBaseDocument = (): BasePolicy =>  {
+  return {
+      Version: "2012-10-17",
+      Statement: []
+  }
+}
+
+const generateBaseStatement = (): Statement => {
+  return {
+      Effect: "Allow",
+      Action: [],
+      Resource: "*"
+  }
+}
+
+const buildExplicitActions = (serviceName: string) => {
+  const actions: Statement = {
+      "Effect": "Allow",
+      "Action": [
+          `${serviceName}:Create*`,
+          `${serviceName}:Read*`,
+          `${serviceName}:Update*`,
+          `${serviceName}:Delete*`,
+          `${serviceName}:Get*`,
+          `${serviceName}:List*`,
+          `${serviceName}:Describe*`,
+          `${serviceName}:Untag*`,
+          `${serviceName}:Tag*`
+      ],
+      "Resource": "*"
+  }
+
+  return actions;
+}
+
+const buildExplicitActionsStatement = (basePolicy: BasePolicy, serviceNamespace: string) => {
+  const explicitActionStatement = buildExplicitActions(serviceNamespace);
+  basePolicy.Statement.push(explicitActionStatement);
+
+  return basePolicy;
+}
 
 const processIAMCsv = async (error: any, csvRecords: any) => {
   for (let record in csvRecords) {

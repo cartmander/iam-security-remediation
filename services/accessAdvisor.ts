@@ -1,13 +1,12 @@
-import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed } from "@aws-sdk/client-iam";
-import { ServiceLastAccessedDetails } from "../interfaces/ServiceLastAccessed.js";
+import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed, GenerateServiceLastAccessedDetailsCommandInput } from "@aws-sdk/client-iam";
 import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-const generateServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
+const generateServiceLastAccessedDetails = async ({ Arn, Granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
-    Arn: arn,
-    Granularity: granularity,
+    Arn: Arn,
+    Granularity: Granularity,
   }; 
 
   const command = new GenerateServiceLastAccessedDetailsCommand(serviceDetailsCommandInput);
@@ -29,10 +28,10 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-export const getServiceLastAccessedDetails = async ({ arn, granularity }: ServiceLastAccessedDetails) => {
+export const getServiceLastAccessedDetails = async ({ Arn, Granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
-    arn: arn,
-    granularity: granularity 
+    Arn: Arn,
+    Granularity: Granularity 
   });
 
   const serviceDetailsInput = {

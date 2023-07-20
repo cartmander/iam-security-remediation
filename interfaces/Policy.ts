@@ -1,4 +1,4 @@
-export interface BaseDocument {
+export interface BasePolicy {
     Version: string;
     Statement: Statement[];
 }

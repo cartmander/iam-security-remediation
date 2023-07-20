@@ -4,8 +4,8 @@ import { processPolicyBuilder } from "./services/policyBuilder.js";
 
 const main = async () => {
   const response = getServiceLastAccessedDetails({ 
-    arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 
-    granularity: "ACTION_LEVEL"
+    Arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 
+    Granularity: "ACTION_LEVEL"
   });
   
   const services = (await response).ServicesLastAccessed;
