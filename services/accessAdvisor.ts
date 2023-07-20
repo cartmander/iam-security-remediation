@@ -74,7 +74,7 @@ export const listServices = (services: ServiceLastAccessed[]): string[] => {
 }
 
 export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
-  const csvFilePath = path.resolve('csvs/iam-service-namespaces-and-actions.csv')
+  const csvFilePath = path.resolve('csvs/iam-services.csv')
 
   for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
     fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\r\n`);

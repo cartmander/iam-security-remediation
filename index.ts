@@ -14,7 +14,7 @@ const main = async () => {
   console.log(listOfServiceNamespacesAndActions);
 
   populateIamCsv("test-biffy-CodeBuild-Role", listOfServiceNamespacesAndActions);
-  processPolicyBuilder("csvs/iam-service-namespaces-and-actions.csv");
+  processPolicyBuilder("csvs/iam-services.csv");
 }
 
 main();
