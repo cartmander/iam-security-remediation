@@ -1,9 +1,9 @@
-export interface BaseIAMDocument {
+export interface BaseDocument {
     Version: string;
-    Statement: IAMStatement[];
+    Statement: Statement[];
 }
 
-export interface IAMStatement {
+export interface Statement {
     Effect: string;
     Action: string[];
     Resource: string;
