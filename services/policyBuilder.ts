@@ -18,7 +18,7 @@ const generateStatement = (): Statement => {
   }
 }
 
-const buildExplicitActions = (serviceName: string) => {
+const generateExplicitActionsStatement = (serviceName: string) => {
   const actions: Statement = {
       "Effect": "Allow",
       "Action": [
@@ -38,23 +38,15 @@ const buildExplicitActions = (serviceName: string) => {
   return actions;
 }
 
-const buildExplicitActionsStatement = (basePolicy: BasePolicy, serviceNamespace: string) => {
-  const explicitActionStatement = buildExplicitActions(serviceNamespace);
-  basePolicy.Statement.push(explicitActionStatement);
-
-  return basePolicy;
-}
-
-const processIAMCsv = async (error: any, csvRecords: any) => {
+const processIamCsv = async (error: any, csvRecords: any) => {
   for (let record in csvRecords) {
-    const { ServiceNamespacesAndActions } = csvRecords[record];
-    const serviceNamespaceOrAction = ServiceNamespacesAndActions as string;
-
+    const { Service } = csvRecords[record];
+    const service = Service as string;
     let servicePolicyDocument = generateBasePolicy();
-    let statement = generateStatement();
 
-    if(!serviceNamespaceOrAction.includes(":")) {
-      servicePolicyDocument = buildExplicitActionsStatement(servicePolicyDocument, serviceNamespaceOrAction);
+    if(!service.includes(":")) {
+      const explicitActionsStatement = generateExplicitActionsStatement(service);
+      servicePolicyDocument.Statement.push(explicitActionsStatement);
     }
     
     else {
@@ -67,7 +59,7 @@ const processIAMCsv = async (error: any, csvRecords: any) => {
 }
 
 export const processPolicyBuilder = async (csvPath: string) => {
-  const headers = ["RoleName", "ServiceNamespacesAndActions"];
+  const headers = ["RoleName", "Service"];
   const csvFilePath = path.resolve(csvPath);
   const csvContent = fs.readFileSync(csvFilePath);
 
@@ -77,5 +69,5 @@ export const processPolicyBuilder = async (csvPath: string) => {
     from_line: 2
   };
 
-  await parse(csvContent, csvOptions, processIAMCsv);
+  await parse(csvContent, csvOptions, processIamCsv);
 }

@@ -49,7 +49,7 @@ export const getServiceLastAccessedDetails = async ({ Arn, Granularity }: Genera
   return response;
 }
 
-export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[]): string[] => {
+export const listServices = (services: ServiceLastAccessed[]): string[] => {
   let listOfServiceNamespacesAndActions: string[] = [];
   let listofServiceNameSpaces: string[] = [];
   let listOfActions: string[] = [];
@@ -73,7 +73,7 @@ export const listServiceNamespacesAndActions = (services: ServiceLastAccessed[])
   return listOfServiceNamespacesAndActions as string[];
 }
 
-export const populateIAMCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
+export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
   const csvFilePath = path.resolve('csvs/iam-service-namespaces-and-actions.csv')
 
   for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
