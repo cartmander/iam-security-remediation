@@ -3,14 +3,14 @@ import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-const generateBasePolicy = (): BasePolicy =>  {
+const generateEmptyBasePolicy = (): BasePolicy =>  {
   return {
       Version: "2012-10-17",
       Statement: []
   }
 }
 
-const generateStatement = (): Statement => {
+const generateEmptyStatement = (): Statement => {
   return {
       Effect: "Allow",
       Action: [],
@@ -18,44 +18,53 @@ const generateStatement = (): Statement => {
   }
 }
 
-const generateExplicitActionsStatement = (serviceName: string) => {
-  const actions: Statement = {
-      "Effect": "Allow",
-      "Action": [
-          `${serviceName}:Create*`,
-          `${serviceName}:Read*`,
-          `${serviceName}:Update*`,
-          `${serviceName}:Delete*`,
-          `${serviceName}:Get*`,
-          `${serviceName}:List*`,
-          `${serviceName}:Describe*`,
-          `${serviceName}:Untag*`,
-          `${serviceName}:Tag*`
+const generateExplicitActionsStatement = (serviceName: string): Statement => {
+  return {
+      Effect: "Allow",
+      Action: [
+        `${serviceName}:Create*`,
+        `${serviceName}:Read*`,
+        `${serviceName}:Update*`,
+        `${serviceName}:Delete*`,
+        `${serviceName}:Get*`,
+        `${serviceName}:List*`,
+        `${serviceName}:Describe*`,
+        `${serviceName}:Untag*`,
+        `${serviceName}:Tag*`
       ],
-      "Resource": "*"
+      Resource: "*"
   }
-
-  return actions;
 }
 
 const processIamCsv = async (error: any, csvRecords: any) => {
+
+  let implicitActionsDictionary: { [serviceName: string]: string } = {}
+
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];
     const service = Service as string;
-    let servicePolicyDocument = generateBasePolicy();
+    let servicePolicyDocument;
 
-    if(!service.includes(":")) {
-      const explicitActionsStatement = generateExplicitActionsStatement(service);
-      servicePolicyDocument.Statement.push(explicitActionsStatement);
+    if (service.includes(":")) {
+      const serviceNamespace = service.split(":")[0];
+      if(implicitActionsDictionary.hasOwnProperty(serviceNamespace)) {
+        implicitActionsDictionary[serviceNamespace] += service;
+      }
+      else {
+        implicitActionsDictionary[serviceNamespace] = service;
+      }
     }
     
     else {
-      //customStatements.Action.push(serviceNamespaceOrAction);
+      servicePolicyDocument = generateEmptyBasePolicy();
+      const explicitActionsStatement = generateExplicitActionsStatement(service);
+      
+      servicePolicyDocument.Statement.push(explicitActionsStatement);
     }
 
     console.log(JSON.stringify(servicePolicyDocument));
+    console.log(JSON.stringify(implicitActionsDictionary));
   }
-  //console.log(JSON.stringify(policyDocument));
 }
 
 export const processPolicyBuilder = async (csvPath: string) => {
