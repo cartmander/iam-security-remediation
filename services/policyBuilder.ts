@@ -18,53 +18,54 @@ const generateEmptyStatement = (): Statement => {
   }
 }
 
-const generateExplicitActionsStatement = (serviceName: string): Statement => {
-  return {
-      Effect: "Allow",
-      Action: [
-        `${serviceName}:Create*`,
-        `${serviceName}:Read*`,
-        `${serviceName}:Update*`,
-        `${serviceName}:Delete*`,
-        `${serviceName}:Get*`,
-        `${serviceName}:List*`,
-        `${serviceName}:Describe*`,
-        `${serviceName}:Untag*`,
-        `${serviceName}:Tag*`
-      ],
-      Resource: "*"
-  }
+const generateExplicitActions = (serviceName: string): string[] => {
+  return [
+    `${serviceName}:Create*`,
+    `${serviceName}:Read*`,
+    `${serviceName}:Update*`,
+    `${serviceName}:Delete*`,
+    `${serviceName}:Get*`,
+    `${serviceName}:List*`,
+    `${serviceName}:Describe*`,
+    `${serviceName}:Untag*`,
+    `${serviceName}:Tag*`
+  ]
 }
 
 const processIamCsv = async (error: any, csvRecords: any) => {
 
-  let implicitActionsDictionary: { [serviceName: string]: string } = {}
+  let actionsDictionary: { [serviceName: string]: string[] } = {}
 
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];
     const service = Service as string;
-    let servicePolicyDocument;
+    const serviceNamespace = service.split(":")[0];
 
     if (service.includes(":")) {
-      const serviceNamespace = service.split(":")[0];
-      if(implicitActionsDictionary.hasOwnProperty(serviceNamespace)) {
-        implicitActionsDictionary[serviceNamespace] += service;
+
+      if (actionsDictionary.hasOwnProperty(serviceNamespace)) {
+        actionsDictionary[serviceNamespace].push(service);
       }
+      
       else {
-        implicitActionsDictionary[serviceNamespace] = service;
+        actionsDictionary[serviceNamespace] = [service];
       }
     }
     
     else {
-      servicePolicyDocument = generateEmptyBasePolicy();
-      const explicitActionsStatement = generateExplicitActionsStatement(service);
+      const explicitActionsStatement = generateExplicitActions(service);
       
-      servicePolicyDocument.Statement.push(explicitActionsStatement);
+      if (actionsDictionary.hasOwnProperty(serviceNamespace)) {
+        actionsDictionary[serviceNamespace] =  actionsDictionary[serviceNamespace].concat(explicitActionsStatement);
+      }
+      
+      else {
+        actionsDictionary[serviceNamespace] = explicitActionsStatement;
+      }
     }
-
-    console.log(JSON.stringify(servicePolicyDocument));
-    console.log(JSON.stringify(implicitActionsDictionary));
   }
+
+  console.log(JSON.stringify(actionsDictionary));
 }
 
 export const processPolicyBuilder = async (csvPath: string) => {
