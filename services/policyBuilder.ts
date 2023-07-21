@@ -1,4 +1,4 @@
-import { BasePolicy, Statement } from "interfaces/Policy";
+import { BasePolicy, Statement, ServiceDictionary } from "interfaces/Policy";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
@@ -32,7 +32,7 @@ const generateExplicitActions = (serviceName: string): string[] => {
   ]
 }
 
-const populateServiceDictionary = (serviceDictionary: { [serviceName: string]: string[] }, serviceNamespace: string, serviceOrAction: string) => {
+const populateServiceDictionary = (serviceDictionary: ServiceDictionary, serviceNamespace: string, serviceOrAction: string) => {
   if (serviceDictionary.hasOwnProperty(serviceNamespace)) {
     serviceDictionary[serviceNamespace].push(serviceOrAction);
   }
@@ -43,7 +43,7 @@ const populateServiceDictionary = (serviceDictionary: { [serviceName: string]: s
 }
 
 const processIamCsv = async (error: any, csvRecords: any) => {
-  let serviceDictionary: { [serviceName: string]: string[] } = {}
+  let serviceDictionary: ServiceDictionary = {}
 
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];

@@ -8,3 +8,7 @@ export interface Statement {
     Action: string[];
     Resource: string;
 }
+
+export interface ServiceDictionary {
+    [ServiceName: string]: string[];
+}
