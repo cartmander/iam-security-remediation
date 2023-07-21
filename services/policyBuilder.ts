@@ -32,7 +32,7 @@ const generateExplicitActions = (serviceName: string): string[] => {
   ]
 }
 
-const populateActionsDictionary = (serviceDictionary: { [serviceName: string]: string[] }, serviceNamespace: string, serviceOrAction: string) => {
+const populateServiceDictionary = (serviceDictionary: { [serviceName: string]: string[] }, serviceNamespace: string, serviceOrAction: string) => {
   if (serviceDictionary.hasOwnProperty(serviceNamespace)) {
     serviceDictionary[serviceNamespace].push(serviceOrAction);
   }
@@ -48,17 +48,17 @@ const processIamCsv = async (error: any, csvRecords: any) => {
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];
     const service = Service as string;
-    const serviceNamespace = service.split(":")[0];
-
+    
     if (service.includes(":")) {
-      populateActionsDictionary(serviceDictionary, serviceNamespace, service);
+      const serviceNamespace = service.split(":")[0];
+      populateServiceDictionary(serviceDictionary, serviceNamespace, service);
     }
     
     else {
       const actions = generateExplicitActions(service);
 
       actions.forEach((action) => {
-        populateActionsDictionary(serviceDictionary, serviceNamespace, action);
+        populateServiceDictionary(serviceDictionary, service, action);
       });
     }
   }
