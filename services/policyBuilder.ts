@@ -32,9 +32,18 @@ const generateExplicitActions = (serviceName: string): string[] => {
   ]
 }
 
-const processIamCsv = async (error: any, csvRecords: any) => {
+const populateActionsDictionary = (serviceDictionary: { [serviceName: string]: string[] }, serviceNamespace: string, serviceOrAction: string) => {
+  if (serviceDictionary.hasOwnProperty(serviceNamespace)) {
+    serviceDictionary[serviceNamespace].push(serviceOrAction);
+  }
 
-  let actionsDictionary: { [serviceName: string]: string[] } = {}
+  else {
+    serviceDictionary[serviceNamespace] = [serviceOrAction];
+  }
+}
+
+const processIamCsv = async (error: any, csvRecords: any) => {
+  let serviceDictionary: { [serviceName: string]: string[] } = {}
 
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];
@@ -42,30 +51,19 @@ const processIamCsv = async (error: any, csvRecords: any) => {
     const serviceNamespace = service.split(":")[0];
 
     if (service.includes(":")) {
-
-      if (actionsDictionary.hasOwnProperty(serviceNamespace)) {
-        actionsDictionary[serviceNamespace].push(service);
-      }
-      
-      else {
-        actionsDictionary[serviceNamespace] = [service];
-      }
+      populateActionsDictionary(serviceDictionary, serviceNamespace, service);
     }
     
     else {
-      const explicitActionsStatement = generateExplicitActions(service);
-      
-      if (actionsDictionary.hasOwnProperty(serviceNamespace)) {
-        actionsDictionary[serviceNamespace] =  actionsDictionary[serviceNamespace].concat(explicitActionsStatement);
-      }
-      
-      else {
-        actionsDictionary[serviceNamespace] = explicitActionsStatement;
-      }
+      const actions = generateExplicitActions(service);
+
+      actions.forEach((action) => {
+        populateActionsDictionary(serviceDictionary, serviceNamespace, action);
+      });
     }
   }
-
-  console.log(JSON.stringify(actionsDictionary));
+  
+  console.log(JSON.stringify(serviceDictionary));
 }
 
 export const processPolicyBuilder = async (csvPath: string) => {
