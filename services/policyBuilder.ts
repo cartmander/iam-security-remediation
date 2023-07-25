@@ -44,7 +44,7 @@ const createInlinePolicies = (serviceDictionary: ServiceDictionary) => {
     basePolicy.Statement.push(statement);
 
     if (!fs.existsSync("results/test-biffy-CodeBuild-Role")) {
-      fs.mkdirSync("results/test-biffy-CodeBuild-Role");
+      fs.mkdirSync("results/test-biffy-CodeBuild-Role",  { recursive: true });
     }
 
     fs.writeFileSync(`results/test-biffy-CodeBuild-Role/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
