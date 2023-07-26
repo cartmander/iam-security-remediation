@@ -1,4 +1,4 @@
-import { BasePolicy, Statement, ServiceDictionary } from "interfaces/Policy";
+import { BasePolicy, Statement, ServiceDictionary } from "interfaces/Policy.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
@@ -43,10 +43,6 @@ const createInlinePolicies = (serviceDictionary: ServiceDictionary) => {
 
     basePolicy.Statement.push(statement);
 
-    if (!fs.existsSync("results/test-biffy-CodeBuild-Role")) {
-      fs.mkdirSync("results/test-biffy-CodeBuild-Role",  { recursive: true });
-    }
-
     fs.writeFileSync(`results/test-biffy-CodeBuild-Role/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
       flag: 'w'
     });
@@ -63,8 +59,8 @@ const populateServiceDictionary = (serviceDictionary: ServiceDictionary, service
   }
 }
 
-const processIamCsv = async (error: any, csvRecords: any) => {
-  let serviceDictionary: ServiceDictionary = {}
+const processInlinePolicyJsons = (error: any, csvRecords: any) => {
+  let serviceDictionary: ServiceDictionary = {};
 
   for (let record in csvRecords) {
     const { Service } = csvRecords[record];
@@ -85,10 +81,9 @@ const processIamCsv = async (error: any, csvRecords: any) => {
   }
 
   createInlinePolicies(serviceDictionary);
-  console.log(JSON.stringify(serviceDictionary));
 }
 
-export const processPolicyBuilder = async (csvPath: string) => {
+export const buildPoliciesFromIamCsv = (csvPath: string) => {
   const headers = ["RoleName", "Service"];
   const csvFilePath = path.resolve(csvPath);
   const csvContent = fs.readFileSync(csvFilePath);
@@ -99,5 +94,5 @@ export const processPolicyBuilder = async (csvPath: string) => {
     from_line: 2
   };
 
-  await parse(csvContent, csvOptions, processIamCsv);
+  parse(csvContent, csvOptions, processInlinePolicyJsons);
 }

@@ -1,12 +1,13 @@
-import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed, GenerateServiceLastAccessedDetailsCommandInput } from "@aws-sdk/client-iam";
+import { GetServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommand, GenerateServiceLastAccessedDetailsCommandOutput, ServiceLastAccessed, TrackedActionLastAccessed } from "@aws-sdk/client-iam";
+import { GenerateServiceLastAccessedDetailsCommandInput } from "interfaces/AccessAdvisor.js";
 import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-const generateServiceLastAccessedDetails = async ({ Arn, Granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
+const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
-    Arn: Arn,
-    Granularity: Granularity,
+    Arn: arn,
+    Granularity: granularity,
   }; 
 
   const command = new GenerateServiceLastAccessedDetailsCommand(serviceDetailsCommandInput);
@@ -28,10 +29,10 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-export const getServiceLastAccessedDetails = async ({ Arn, Granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
+export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
-    Arn: Arn,
-    Granularity: Granularity 
+    arn: arn,
+    granularity: granularity 
   });
 
   const serviceDetailsInput = {
@@ -73,8 +74,20 @@ export const listServices = (services: ServiceLastAccessed[]): string[] => {
   return listOfServiceNamespacesAndActions as string[];
 }
 
-export const populateIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
-  const csvFilePath = path.resolve('csvs/iam-services.csv')
+export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
+
+  const roleDirectory = `results/${roleName}`;
+  const roleCsv = `${roleDirectory}/${roleName}.csv`;
+
+  if (!fs.existsSync(roleDirectory)) {
+    fs.mkdirSync(roleDirectory,  { recursive: true });
+  }
+
+  fs.writeFileSync(roleCsv, "RoleName,Service\n", {
+    flag: 'w'
+  });
+
+  const csvFilePath = path.resolve(roleCsv);
 
   for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
     fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\r\n`);

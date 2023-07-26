@@ -1,20 +1,18 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
-import { getServiceLastAccessedDetails, listServices, populateIamCsv } from "./services/accessAdvisor.js";
-import { processPolicyBuilder } from "./services/policyBuilder.js";
+import { getServiceLastAccessedDetails, listServices, buildIamCsv } from "./services/accessAdvisor.js";
+import { buildPoliciesFromIamCsv } from "./services/policyBuilder.js";
 
-const main = async () => {
+const main = async (roleName: string, arn: string) => {
   const response = getServiceLastAccessedDetails({ 
-    Arn: "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role", 
-    Granularity: "ACTION_LEVEL"
+    arn: arn, 
+    granularity: "ACTION_LEVEL"
   });
   
   const services = (await response).ServicesLastAccessed;
-  
   const listOfServiceNamespacesAndActions = listServices(services as ServiceLastAccessed[]);
-  console.log(listOfServiceNamespacesAndActions);
 
-  populateIamCsv("test-biffy-CodeBuild-Role", listOfServiceNamespacesAndActions);
-  processPolicyBuilder("csvs/iam-services.csv");
+  buildIamCsv(roleName, listOfServiceNamespacesAndActions);
+  buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);
 }
 
-main();
+main("test-biffy-CodeBuild-Role", "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role");
