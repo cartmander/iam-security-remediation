@@ -90,6 +90,6 @@ export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: strin
   const csvFilePath = path.resolve(roleCsv);
 
   for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
-    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\r\n`);
+    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\n`);
   }
 }

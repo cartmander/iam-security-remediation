@@ -16,3 +16,4 @@ const main = async (roleName: string, arn: string) => {
 }
 
 main("test-biffy-CodeBuild-Role", "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role");
+main("qa-biffy-us-east-1-CodeBuild-Role", "arn:aws:iam::539383487878:role/qa-biffy-us-east-1-CodeBuild-Role");

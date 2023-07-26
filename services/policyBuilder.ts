@@ -32,7 +32,7 @@ const generateExplicitActions = (serviceName: string): string[] => {
   ]
 }
 
-const createInlinePolicies = (serviceDictionary: ServiceDictionary) => {
+const createInlinePolicies = (serviceDictionary: ServiceDictionary, roleName: string) => {
   for (let key in serviceDictionary) {
     let value = serviceDictionary[key];
 
@@ -43,7 +43,7 @@ const createInlinePolicies = (serviceDictionary: ServiceDictionary) => {
 
     basePolicy.Statement.push(statement);
 
-    fs.writeFileSync(`results/test-biffy-CodeBuild-Role/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
+    fs.writeFileSync(`results/${roleName}/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
       flag: 'w'
     });
   }
@@ -61,11 +61,16 @@ const populateServiceDictionary = (serviceDictionary: ServiceDictionary, service
 
 const processInlinePolicyJsons = (error: any, csvRecords: any) => {
   let serviceDictionary: ServiceDictionary = {};
+  let roleName = null;
 
   for (let record in csvRecords) {
-    const { Service } = csvRecords[record];
+    const { RoleName, Service } = csvRecords[record];
     const service = Service as string;
     
+    if (roleName == null) {
+      roleName = RoleName;
+    }
+
     if (service.includes(":")) {
       const serviceNamespace = service.split(":")[0];
       populateServiceDictionary(serviceDictionary, serviceNamespace, service);
@@ -80,7 +85,7 @@ const processInlinePolicyJsons = (error: any, csvRecords: any) => {
     }
   }
 
-  createInlinePolicies(serviceDictionary);
+  createInlinePolicies(serviceDictionary, roleName);
 }
 
 export const buildPoliciesFromIamCsv = (csvPath: string) => {
