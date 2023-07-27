@@ -43,9 +43,15 @@ const createInlinePolicies = (serviceDictionary: ServiceDictionary, roleName: st
 
     basePolicy.Statement.push(statement);
 
-    fs.writeFileSync(`results/${roleName}/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
-      flag: 'w'
-    });
+    try {
+      fs.writeFileSync(`results/${roleName}/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
+        flag: 'w'
+      });
+    }
+    
+    catch (error: any) {
+      console.log(error.message);
+    }
   }
 }
 

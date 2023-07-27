@@ -17,14 +17,11 @@ const generateServiceLastAccessedDetails = async ({ arn, granularity }: Generate
 }
 
 const listActions = (listOfActions: string[], service: string, actions: TrackedActionLastAccessed[]): string[] => {
-  for (let i = 0; i < actions.length; i ++)
-  {
-    const action = actions[i];
-
+  actions.forEach((action) => {
     if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null) {
       listOfActions.push(`${service}:${ action.ActionName }`);
     }
-  }
+  });
 
   return listOfActions;
 }
@@ -56,10 +53,7 @@ export const listServices = (services: ServiceLastAccessed[]): string[] => {
   let listOfActions: string[] = [];
   let actions: string[] = [];
 
-  for (let i = 0; i < services.length; i ++)
-  {
-    const service = services[i];
-
+  services.forEach((service) => {
     if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0) {
       listofServiceNameSpaces.push(service.ServiceNamespace as string);
     }
@@ -67,7 +61,7 @@ export const listServices = (services: ServiceLastAccessed[]): string[] => {
     if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
       listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
     }
-  }
+  });
 
   listOfServiceNamespacesAndActions = listOfServiceNamespacesAndActions.concat(listofServiceNameSpaces);
 
@@ -89,7 +83,7 @@ export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: strin
 
   const csvFilePath = path.resolve(roleCsv);
 
-  for (let i = 0; i < serviceNamespacesAndActions.length; i ++) {
-    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespacesAndActions[i]}\n`);
-  }
+  serviceNamespacesAndActions.forEach((serviceNamespaceAndAction) => {
+    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespaceAndAction}\n`);
+  });
 }

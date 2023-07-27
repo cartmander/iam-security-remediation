@@ -1,5 +1,6 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
 import { getServiceLastAccessedDetails, listServices, buildIamCsv } from "./services/accessAdvisor.js";
+import { listRoles } from "./services/listRoles.js";
 import { buildPoliciesFromIamCsv } from "./services/policyBuilder.js";
 
 const main = async (roleName: string, arn: string) => {
@@ -15,5 +16,10 @@ const main = async (roleName: string, arn: string) => {
   buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);
 }
 
-main("test-biffy-CodeBuild-Role", "arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role");
-main("qa-biffy-us-east-1-CodeBuild-Role", "arn:aws:iam::539383487878:role/qa-biffy-us-east-1-CodeBuild-Role");
+const roles = await listRoles();
+
+roles.forEach(role => {
+  if (role.RoleName != null && role.Arn != null) {
+    main(role.RoleName, role.Arn);
+  }
+});
