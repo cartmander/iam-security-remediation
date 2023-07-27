@@ -69,7 +69,6 @@ export const listServices = (services: ServiceLastAccessed[]): string[] => {
 }
 
 export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
-
   const roleDirectory = `results/${roleName}`;
   const roleCsv = `${roleDirectory}/${roleName}.csv`;
 
