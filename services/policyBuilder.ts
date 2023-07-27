@@ -32,7 +32,7 @@ const generateExplicitActions = (serviceName: string): string[] => {
   ]
 }
 
-const createInlinePolicies = (serviceDictionary: ServiceDictionary, roleName: string) => {
+const buildInlinePolicies = (serviceDictionary: ServiceDictionary, roleName: string) => {
   for (let key in serviceDictionary) {
     let value = serviceDictionary[key];
 
@@ -65,7 +65,7 @@ const populateServiceDictionary = (serviceDictionary: ServiceDictionary, service
   }
 }
 
-const processInlinePolicyJsons = (error: any, csvRecords: any) => {
+const processBuildingInlinePolicy = (error: any, csvRecords: any) => {
   let serviceDictionary: ServiceDictionary = {};
   let roleName = null;
 
@@ -91,7 +91,7 @@ const processInlinePolicyJsons = (error: any, csvRecords: any) => {
     }
   }
 
-  createInlinePolicies(serviceDictionary, roleName);
+  buildInlinePolicies(serviceDictionary, roleName);
 }
 
 export const buildPoliciesFromIamCsv = (csvPath: string) => {
@@ -105,5 +105,5 @@ export const buildPoliciesFromIamCsv = (csvPath: string) => {
     from_line: 2
   };
 
-  parse(csvContent, csvOptions, processInlinePolicyJsons);
+  parse(csvContent, csvOptions, processBuildingInlinePolicy);
 }
