@@ -21,4 +21,4 @@ This automation will make use of AWS IAM Access Advisor to determine which servi
 - Go to GitHub Action, then select **Generate Inline Policies for Roles** workflow.
 - Point it to your branch and choose an environment.
 - Wait for it the workflow to be completed.
-- Look into the the upload archive for results containing the roles' inline policies.
+- Look into the results containing the roles' inline policies.
