@@ -17,7 +17,7 @@ This automation will make use of AWS IAM Access Advisor to determine which servi
 
 ## How To Use
 - Branch out from ```main``` 
-- Populate the ```csvs/iam_roles.csv``` with roles with the following fields: ```RoleName, Arn```
+- Populate the ```csvs/iam_roles.csv``` with roles using the following fields: ```RoleName, Arn```
 - Go to GitHub Action, then select **Generate Inline Policies for Roles** workflow.
 - Point it to your branch and choose an environment.
 - Wait for it the workflow to be completed.
