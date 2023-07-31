@@ -5,7 +5,6 @@ import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-
 const main = async (roleName: string, arn: string) => {
   const response = getServiceLastAccessedDetails({ 
     arn: arn, 
