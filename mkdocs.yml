@@ -1,0 +1,8 @@
+site_name: AWS IAM Least Privilege Automation Docs
+site_description: Documentation for AWS IAM Least Privilege Automation
+
+nav:
+  - Introduction: index.md
+
+plugins:
+- techdocs-core
