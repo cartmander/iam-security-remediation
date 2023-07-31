@@ -1,7 +1,10 @@
 import { ServiceLastAccessed } from "@aws-sdk/client-iam";
 import { getServiceLastAccessedDetails, listServices, buildIamCsv } from "./services/accessAdvisor.js";
-import { listRoles } from "./services/listRoles.js";
 import { buildPoliciesFromIamCsv } from "./services/policyBuilder.js";
+import { parse } from "csv-parse";
+import path from "path";
+import fs from "fs";
+
 
 const main = async (roleName: string, arn: string) => {
   const response = getServiceLastAccessedDetails({ 
@@ -16,10 +19,25 @@ const main = async (roleName: string, arn: string) => {
   buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);
 }
 
-const roles = await listRoles();
-
-roles.forEach(role => {
-  if (role.RoleName != null && role.Arn != null) {
-    main(role.RoleName, role.Arn);
+const processRoleRemediation = (error: any, csvRecords: any) => {
+  for (let record in csvRecords) {
+    const { RoleName, Arn } = csvRecords[record];
+    main(RoleName, Arn);
   }
-});
+}
+
+const getRolesFromIamCsv = (csvPath: string) => {
+  const headers = ["RoleName", "Arn"];
+  const csvFilePath = path.resolve(csvPath);
+  const csvContent = fs.readFileSync(csvFilePath);
+
+  const csvOptions = {
+    delimiter: ",",
+    columns: headers,
+    from_line: 2
+  };
+
+  parse(csvContent, csvOptions, processRoleRemediation);
+}
+
+getRolesFromIamCsv("csvs/iam_roles.csv");
