@@ -10,7 +10,7 @@ on:
         - UBIF-NONPROD
 
 jobs:
-  build:
+  generate:
     runs-on: [self-hosted, common-8gb]
     env:
       GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
