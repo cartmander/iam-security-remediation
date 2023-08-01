@@ -3,17 +3,18 @@ name: Generate Inline Policies for Roles
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        type: choice
-        description: Choose an environment
-        options:
-        - UBIF-NONPROD
+      region:
+        type: string
+        description: 'AWS Region'
+        required: true
+      role:
+        type: string
+        description: 'AWS Account and Role'
+        required: true
 
 jobs:
   generate:
     runs-on: [self-hosted, common-8gb]
-    env:
-      GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
 
     steps:
     - name: Checkout
@@ -29,8 +30,13 @@ jobs:
         npm install
         npm install -g typescript
 
-    - name: Set Environment
-      run: export AWS_PROFILE=ubreakifix-nonprod.appadmins
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-region: ${{ inputs.region }}
+        role-to-assume: ${{ inputs.role }}
+        role-duration-seconds: 3600
+        role-skip-session-tagging: true
 
     - name: Generate
       run: npm run generate
