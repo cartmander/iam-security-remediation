@@ -6,9 +6,12 @@ metadata:
         AWS IAM Least Privilege Automation
     tags:
         - ubreakifix
+        - documentation
+        - typescript
+        - iam
     annotations:
-        github.com/project-slug: ubreakifix/ubif-iam-role-cdk-access-advisor
-        backstage.io/techdocs-ref: url:https://github.com/ubreakifix/ubif-iam-role-cdk-access-advisor/tree/main
+        github.com/project-slug: asurion-private/iam-role-access-advisor
+        backstage.io/techdocs-ref: url:https://github.com/asurion-private/iam-role-access-advisor/tree/main
     namespace: default
 spec:
     type: Documentation
