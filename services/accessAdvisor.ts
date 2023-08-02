@@ -41,9 +41,14 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   }
 
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
-  const response = await client.send(command);
-  
-  sleep(10000);
+  let response = await client.send(command);
+
+  let gg = 0;
+
+  while (response.JobStatus == "IN_PROGRESS") {
+    console.log(gg);
+    response = await client.send(command);
+  }
 
   return response;
 }
