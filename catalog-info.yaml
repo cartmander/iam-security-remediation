@@ -16,5 +16,5 @@ metadata:
 spec:
     type: Documentation
     owner: dev-ops
-    lifecycle: experimental
+    lifecycle: production
     system: ubif
