@@ -4,6 +4,10 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
+const sleep = (ms: number): Promise<void> => {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
     Arn: arn,
@@ -39,9 +43,9 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
   let response = await client.send(command);
   
-  while (response.JobStatus == "IN_PROGRESS")
-  {
+  while (response.JobStatus == "IN_PROGRESS") {
     response = await client.send(command);
+    sleep(3000);
   }
 
   return response;
