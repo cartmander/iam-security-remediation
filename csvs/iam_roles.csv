@@ -1,4 +1,2 @@
 RoleName,Arn
 test-biffy-CodeBuild-Role,arn:aws:iam::539383487878:role/test-biffy-CodeBuild-Role
-acdk-qa-biffy-codebuild-role,arn:aws:iam::539383487878:role/acdk-qa-biffy-codebuild-role
-acdk-adminer-codepipeline-codebuildprojectacdkadmi-SVK4N3MHCB10,arn:aws:iam::539383487878:role/acdk-adminer-codepipeline-codebuildprojectacdkadmi-SVK4N3MHCB10
