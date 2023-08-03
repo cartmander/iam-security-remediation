@@ -48,7 +48,10 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
   let response = await client.send(command);
 
+  const message = "Please don't call me yet"
+
   while (response.JobStatus == "IN_PROGRESS") {
+    console.log(message);
     setTimeout(makeIteration, 1000);
     response = await client.send(command);
   }
