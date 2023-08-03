@@ -4,9 +4,14 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-const sleep = (ms: number): Promise<void> => {
-  return new Promise((r) => setTimeout(r, ms));
-}
+const makeIteration = (seconds: 10): void => {
+    console.clear();
+    if (seconds > 0) {
+        console.log(seconds);
+        setTimeout(makeIteration, 1000); // 1 second waiting
+    }
+    seconds -= 1;
+};
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
@@ -43,10 +48,8 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
   let response = await client.send(command);
 
-  let gg = 0;
-
   while (response.JobStatus == "IN_PROGRESS") {
-    console.log(gg);
+    setTimeout(makeIteration, 1000);
     response = await client.send(command);
   }
 
