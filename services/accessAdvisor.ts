@@ -26,9 +26,36 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
+const waitGetServiceLastAccessedDetails = async (jobid: string) => {
   let response;
-  
+
+  while (true) {
+    const command = new GetServiceLastAccessedDetailsCommand(
+    {
+      JobId: jobid
+    });
+
+    const response = await client.send(command);
+    const jobStatus = response.JobStatus;
+
+    if (jobStatus === "COMPLETED") {
+      console.log("Job has completed");
+      return response;
+    }
+
+    else if (jobStatus === "IN_PROGRESS") {
+      console.log("Job is still in progress. Waiting...");
+    }
+
+    else {
+      console.log("Job has encountered an error");
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+}
+
+export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
     arn: arn,
     granularity: granularity 
@@ -38,13 +65,7 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
     JobId: (await serviceDetailsResponse).JobId
   }
 
-  const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
-  response = await client.send(command);
-
-  while (response.JobStatus == "IN_PROGRESS") {
-    response = await client.send(command);
-  }
-
+  const response = waitGetServiceLastAccessedDetails(serviceDetailsInput.JobId as string);
   return response;
 }
 
