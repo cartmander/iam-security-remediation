@@ -50,8 +50,6 @@ const waitGetServiceLastAccessedDetails = async (jobid: string) => {
     else {
       console.log("Job has encountered an error");
     }
-
-    await new Promise(resolve => setTimeout(resolve, 500));
   }
 }
 
