@@ -10,14 +10,12 @@ const main = async (roleName: string, arn: string) => {
     arn: arn, 
     granularity: "ACTION_LEVEL"
   });
+  
+  const services = (await response).ServicesLastAccessed;
+  const listOfServiceNamespacesAndActions = listServices(services as ServiceLastAccessed[]);
 
-  setTimeout(async () => {
-    const services = (await response).ServicesLastAccessed;
-    const listOfServiceNamespacesAndActions = listServices(services as ServiceLastAccessed[]);
-
-    buildIamCsv(roleName, listOfServiceNamespacesAndActions);
-    buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);
-}, 10000);
+  buildIamCsv(roleName, listOfServiceNamespacesAndActions);
+  buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);
 }
 
 const processRoleRemediation = (error: any, csvRecords: any) => {
