@@ -4,15 +4,6 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-const makeIteration = (seconds: 10): void => {
-    console.clear();
-    if (seconds > 0) {
-        console.log(seconds);
-        setTimeout(makeIteration, 1000); // 1 second waiting
-    }
-    seconds -= 1;
-};
-
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
     Arn: arn,
@@ -36,6 +27,8 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
 }
 
 export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
+  let response;
+  
   const serviceDetailsResponse = generateServiceLastAccessedDetails({
     arn: arn,
     granularity: granularity 
@@ -46,13 +39,9 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   }
 
   const command = new GetServiceLastAccessedDetailsCommand(serviceDetailsInput);
-  let response = await client.send(command);
-
-  const message = "Please don't call me yet"
+  response = await client.send(command);
 
   while (response.JobStatus == "IN_PROGRESS") {
-    console.log(message);
-    setTimeout(makeIteration, 1000);
     response = await client.send(command);
   }
 
