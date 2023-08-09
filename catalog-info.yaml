@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-    name: aws-iam-least-privilege-automation
+    name: iam-role-access-advisor
     description: |
         AWS IAM Least Privilege Automation
     tags:
@@ -14,7 +14,7 @@ metadata:
         backstage.io/techdocs-ref: url:https://github.com/asurion-private/iam-role-access-advisor/tree/main
     namespace: default
 spec:
-    type: Documentation
-    owner: dev-ops
+    type: Service
+    owner: pse-admins
     lifecycle: production
     system: shared-catalog
