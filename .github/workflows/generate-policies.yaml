@@ -9,7 +9,7 @@ on:
         required: true
       role:
         type: string
-        description: 'AWS Account and Role'
+        description: 'AWS IAM Role'
         required: true
 
 jobs:
