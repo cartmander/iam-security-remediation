@@ -1,7 +1,5 @@
 # AWS IAM Least Privilege Automation
 
-This repository has been archived already, see this repository instead: [iam-role-access-advisor](https://github.com/asurion-private/iam-role-access-advisor).
-
 ## Introduction
 This automation will make use of AWS IAM Access Advisor to determine which services are only being used in a role. The output of this automation is to produce inline policies for roles specified in the csv file. 
 
