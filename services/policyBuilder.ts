@@ -39,19 +39,23 @@ const buildInlinePolicies = (serviceDictionary: ServiceDictionary, roleName: str
     let basePolicy = generateEmptyBasePolicy();
     let statement = generateEmptyStatement();
 
-    statement.Action = statement.Action.concat(value);
+    const policyName = `${roleName}/${key}-inline-policy.json`;
 
+    statement.Action = statement.Action.concat(value);
     basePolicy.Statement.push(statement);
 
     try {
-      fs.writeFileSync(`results/${roleName}/${key}-inline-policy.json`, JSON.stringify(basePolicy), {
+      fs.writeFileSync(`results/${policyName}`, JSON.stringify(basePolicy), {
         flag: 'w'
       });
     }
     
     catch (error: any) {
       console.log(error.message);
+      return;
     }
+    
+    console.log(`Created ${policyName} for ${roleName}.`);
   }
 }
 
@@ -91,7 +95,15 @@ const processBuildingInlinePolicy = (error: any, csvRecords: any) => {
     }
   }
 
-  buildInlinePolicies(serviceDictionary, roleName);
+  try {
+    buildInlinePolicies(serviceDictionary, roleName);
+  }
+
+  catch (error: any) {
+    console.log(`Error building inline policies for role: ${roleName}`);
+    console.log(error.message);
+    return;
+  }
 }
 
 export const buildPoliciesFromIamCsv = (csvPath: string) => {

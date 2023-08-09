@@ -9,10 +9,10 @@ const main = async (roleName: string, arn: string) => {
   const response = getServiceLastAccessedDetails({ 
     arn: arn, 
     granularity: "ACTION_LEVEL"
-  });
-  
-  const services = (await response).ServicesLastAccessed;
-  const listOfServiceNamespacesAndActions = listServices(services as ServiceLastAccessed[]);
+  }, roleName);
+
+  const services = (await response)?.ServicesLastAccessed;
+  const listOfServiceNamespacesAndActions = listServices(services as ServiceLastAccessed[], roleName);
 
   buildIamCsv(roleName, listOfServiceNamespacesAndActions);
   buildPoliciesFromIamCsv(`results/${roleName}/${roleName}.csv`);

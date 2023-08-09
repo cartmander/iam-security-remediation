@@ -26,66 +26,83 @@ const listActions = (listOfActions: string[], service: string, actions: TrackedA
   return listOfActions;
 }
 
-const waitGetServiceLastAccessedDetails = async (jobid: string) => {
-  let response;
-
+const waitGetServiceLastAccessedDetails = async (jobId: string) => {
   while (true) {
-    const command = new GetServiceLastAccessedDetailsCommand(
-    {
-      JobId: jobid
-    });
+    const command = new GetServiceLastAccessedDetailsCommand({ JobId: jobId });
 
     const response = await client.send(command);
     const jobStatus = response.JobStatus;
 
     if (jobStatus === "COMPLETED") {
-      console.log("Job has completed");
+      console.log(`Job Id ${jobId} has completed.`);
       return response;
     }
 
     else if (jobStatus === "IN_PROGRESS") {
-      console.log("Job is still in progress. Waiting...");
+      console.log(`Job ${jobId} is still in progress. Waiting...`);
     }
 
     else {
-      console.log("Job has encountered an error");
+      console.log(`Job ${jobId} has encountered an error.`);
     }
 
     await new Promise(resolve => setTimeout(resolve, 5000));
   }
 }
 
-export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput) => {
-  const serviceDetailsResponse = generateServiceLastAccessedDetails({
-    arn: arn,
-    granularity: granularity 
-  });
+export const getServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput, roleName: string) => {
+  let jobId;
+  
+  console.log(`Generating job to get last accessed services details for role: ${roleName}.`);
+  
+  try {
+    const serviceDetailsResponse = generateServiceLastAccessedDetails({
+      arn: arn,
+      granularity: granularity 
+    });
+  
+    const serviceDetailsInput = {
+      JobId: (await serviceDetailsResponse).JobId
+    }
 
-  const serviceDetailsInput = {
-    JobId: (await serviceDetailsResponse).JobId
+    jobId = serviceDetailsInput.JobId as string;
   }
 
-  const response = waitGetServiceLastAccessedDetails(serviceDetailsInput.JobId as string);
+  catch (error: any) {
+    console.log(`Error generating a job for role: ${roleName}`);
+    console.log(error.message);
+    return;
+  }
+
+  console.log(`Generated job id: ${jobId} for role: ${roleName}`);
+  const response = waitGetServiceLastAccessedDetails(jobId);
   return response;
 }
 
-export const listServices = (services: ServiceLastAccessed[]): string[] => {
+export const listServices = (services: ServiceLastAccessed[], roleName: string): string[] => {
   let listOfServiceNamespacesAndActions: string[] = [];
   let listofServiceNameSpaces: string[] = [];
   let listOfActions: string[] = [];
   let actions: string[] = [];
 
-  services.forEach((service) => {
-    if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0) {
-      listofServiceNameSpaces.push(service.ServiceNamespace as string);
-    }
+  try {
+    services.forEach((service) => {
+      if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0) {
+        listofServiceNameSpaces.push(service.ServiceNamespace as string);
+      }
+  
+      if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
+        listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
+      }
+    });
+  
+    listOfServiceNamespacesAndActions = listOfServiceNamespacesAndActions.concat(listofServiceNameSpaces);
+  }
 
-    if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
-      listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
-    }
-  });
-
-  listOfServiceNamespacesAndActions = listOfServiceNamespacesAndActions.concat(listofServiceNameSpaces);
+  catch (error: any) {
+    console.log(`Error listing IAM services for role: ${roleName}`);
+    console.log(error.message);
+  }
 
   return listOfServiceNamespacesAndActions as string[];
 }
@@ -94,17 +111,25 @@ export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: strin
   const roleDirectory = `results/${roleName}`;
   const roleCsv = `${roleDirectory}/${roleName}.csv`;
 
-  if (!fs.existsSync(roleDirectory)) {
-    fs.mkdirSync(roleDirectory,  { recursive: true });
+  try {
+    if (!fs.existsSync(roleDirectory)) {
+      fs.mkdirSync(roleDirectory,  { recursive: true });
+    }
+  
+    fs.writeFileSync(roleCsv, "RoleName,Service\n", {
+      flag: 'w'
+    });
+
+    const csvFilePath = path.resolve(roleCsv);
+
+    serviceNamespacesAndActions.forEach((serviceNamespaceAndAction) => {
+      fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespaceAndAction}\n`);
+    });
   }
 
-  fs.writeFileSync(roleCsv, "RoleName,Service\n", {
-    flag: 'w'
-  });
-
-  const csvFilePath = path.resolve(roleCsv);
-
-  serviceNamespacesAndActions.forEach((serviceNamespaceAndAction) => {
-    fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespaceAndAction}\n`);
-  });
+  catch (error: any) {
+    console.log(`Error building IAM csv for role: ${roleName}`);
+    console.log(error.message);
+    return;
+  }
 }
