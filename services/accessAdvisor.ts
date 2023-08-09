@@ -108,6 +108,7 @@ export const listServices = (services: ServiceLastAccessed[], roleName: string):
 export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: string[]) => {
   const roleDirectory = `results/${roleName}`;
   const roleCsv = `${roleDirectory}/${roleName}.csv`;
+  const csvFilePath = path.resolve(roleCsv);
 
   try {
     if (!fs.existsSync(roleDirectory)) {
@@ -117,8 +118,6 @@ export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: strin
     fs.writeFileSync(roleCsv, "RoleName,Service\n", {
       flag: 'w'
     });
-
-    const csvFilePath = path.resolve(roleCsv);
 
     serviceNamespacesAndActions.forEach((serviceNamespaceAndAction) => {
       fs.appendFileSync(csvFilePath, `${roleName},${serviceNamespaceAndAction}\n`);
