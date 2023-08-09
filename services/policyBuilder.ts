@@ -100,8 +100,7 @@ const processBuildingInlinePolicy = (error: any, csvRecords: any) => {
   }
 
   catch (error: any) {
-    console.log(`Error building inline policies for role: ${roleName}`);
-    console.log(error.message);
+    console.log(`Error building inline policies for role: ${roleName}: `, error.message);
     return;
   }
 }

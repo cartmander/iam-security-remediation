@@ -69,8 +69,7 @@ export const getServiceLastAccessedDetails = async ({ arn, granularity }: Genera
   }
 
   catch (error: any) {
-    console.log(`Error generating a job for role: ${roleName}`);
-    console.log(error.message);
+    console.log(`Error generating a job for role: ${roleName}: `, error.message);
     return;
   }
 
@@ -100,8 +99,7 @@ export const listServices = (services: ServiceLastAccessed[], roleName: string):
   }
 
   catch (error: any) {
-    console.log(`Error listing IAM services for role: ${roleName}`);
-    console.log(error.message);
+    console.log(`Error listing IAM services for role: ${roleName}: `, error.message);
   }
 
   return listOfServiceNamespacesAndActions as string[];
@@ -128,8 +126,7 @@ export const buildIamCsv = (roleName: string, serviceNamespacesAndActions: strin
   }
 
   catch (error: any) {
-    console.log(`Error building IAM csv for role: ${roleName}`);
-    console.log(error.message);
+    console.log(`Error building IAM csv for role: ${roleName}: `, error.message);
     return;
   }
 }
