@@ -1,9 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-    name: iam-least-privilege-automation
+    name: aws-iam-least-privilege-automation
     description: |
-        IAM Least Privilege Automation
+        AWS IAM Least Privilege Automation
     tags:
         - ubreakifix
         - documentation
