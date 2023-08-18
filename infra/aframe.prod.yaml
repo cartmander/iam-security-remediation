@@ -12,7 +12,7 @@ cicd:
   workflowCommands:
     preWorkflowCommandsCommand: 
     dependencyInstallCommand: npm i
-    buildCommand: 
+    buildCommand: npm install -g typescript
     deployCommand: npm run generate 
     postWorkflowCommandsCommand: 
   environmentVariables:
