@@ -5,9 +5,9 @@ on:
 
 jobs:
   call-workflow-passing-data:
-    uses: asurion-private/afr-shared-workflow/.github/workflows/shared-workflow.yaml@v2.4.0   
+    uses: asurion-private/afr-shared-workflow/.github/workflows/shared-workflow.yaml@feat/upload-artifact-implementation
     with:
-      repo: 
+      repo: iam-role-access-advisor
       branchToCheckout: main
       runner: common-8gb-or-smaller
       aframeFilePath: ./infra/aframe.prod.yaml
