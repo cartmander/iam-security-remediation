@@ -1,0 +1,42 @@
+# AFRAME Config File
+
+cicd:
+  workflowProps:
+    preWorkflowPropsCommand: 
+    deployIamRole: arn:aws:iam::912372797425:role/ubif-github-role
+    nvmFilePath: .nvmrc
+    nodeCacheType: npm
+    nodeCacheDependencyPath: ./package-lock.json
+    postWorkflowPropsCommand: 
+    jobSummary: This is a test job summary :rocket:
+  workflowCommands:
+    preWorkflowCommandsCommand: 
+    dependencyInstallCommand: 
+    buildCommand: 
+    deployCommand: 
+    postWorkflowCommandsCommand: 
+  environmentVariables:
+    ENV: feat
+  rfc:
+    preRFCCommand: 
+    templateID: 
+    description: 
+    changePlan: 
+    postRFCCommand: 
+  deployment:
+    preDeploymentCommand: 
+    targetURL: 
+    environment: 
+    postDeploymentCommand: 
+  slack:
+    preSlackCommand: 
+    channel: 
+    payLoadFilePath: 
+    postSlackCommand: 
+  callWorkflow:
+    preCallWorkflowCommand: 
+    repoName: 
+    branchName: 
+    workflowName: 
+    inputsFilePath: 
+    postCallWorkflowCommand: 
