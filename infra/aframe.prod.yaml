@@ -8,12 +8,12 @@ cicd:
     nodeCacheType: npm
     nodeCacheDependencyPath: ./package-lock.json
     postWorkflowPropsCommand: 
-    jobSummary: This is a test job summary :rocket:
+    jobSummary: 🚀
   workflowCommands:
     preWorkflowCommandsCommand: 
-    dependencyInstallCommand: 
+    dependencyInstallCommand: npm i
     buildCommand: 
-    deployCommand: 
+    deployCommand: npm run generate 
     postWorkflowCommandsCommand: 
   environmentVariables:
     ENV: feat
