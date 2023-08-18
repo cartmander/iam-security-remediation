@@ -3,7 +3,7 @@
 cicd:
   workflowProps:
     preWorkflowPropsCommand: 
-    deployIamRole: arn:aws:iam::912372797425:role/ubif-github-role
+    deployIamRole: arn:aws:iam::539383487878:role/ubif-github-role
     nvmFilePath: .nvmrc
     nodeCacheType: npm
     nodeCacheDependencyPath: ./package-lock.json
@@ -33,6 +33,9 @@ cicd:
     channel: 
     payLoadFilePath: 
     postSlackCommand: 
+  uploadArtifact:
+    name: results
+    path: results/
   callWorkflow:
     preCallWorkflowCommand: 
     repoName: 
