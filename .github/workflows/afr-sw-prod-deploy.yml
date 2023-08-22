@@ -1,11 +1,21 @@
-name: Aframe Shared Workflow
+name: Generate Inline Policies for Roles (Shared Workflow)
 
 on:
   workflow_dispatch:
+    inputs:
+      region:
+        description: 'AWS Region'
+        required: true
+        type: string
+      role:
+        description: 'AWS Role'
+        required: true
+        type: string
+
 
 jobs:
   call-workflow-passing-data:
-    uses: asurion-private/afr-shared-workflow/.github/workflows/shared-workflow.yaml@feat/upload-artifact-implementation
+    uses: asurion-private/afr-shared-workflow/.github/workflows/shared-workflow.yaml@2.6.1
     with:
       repo: iam-role-access-advisor
       branchToCheckout: main

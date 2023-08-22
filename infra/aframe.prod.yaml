@@ -3,7 +3,7 @@
 cicd:
   workflowProps:
     preWorkflowPropsCommand: 
-    deployIamRole: arn:aws:iam::539383487878:role/ubif-github-role
+    deployIamRole: ${{ inputs.role }}
     nvmFilePath:
     nodeCacheType: npm
     nodeCacheDependencyPath: ./package-lock.json
