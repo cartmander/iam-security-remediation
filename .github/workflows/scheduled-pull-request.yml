@@ -1,5 +1,6 @@
 name: Scheduled Pull Request
 on:
+  workflow_dispatch:
   schedule:
     - cron: "*/2 * * * *"
     
