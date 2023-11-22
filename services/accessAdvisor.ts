@@ -4,9 +4,7 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-//For Scheduled PR demo
-//More
-//Again
+//DS-1234
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
