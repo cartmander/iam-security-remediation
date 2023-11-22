@@ -14,17 +14,18 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
+          const { repo, owner } = context.repo;
+        
           const commitMessages = await github.rest.repos.listCommits({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
+            owner: owner,
+            repo: repo,
+          }).then(response => response.data.map(commit => commit.commit.message).join(" "));
 
-          const filteredMessages = commitMessages.data.map(commit => commit.commit.message).filter(message => /DS-[0-9]+/.test(message));
+          const extractedMessages = commitMessages.match(/DG-[0-9]+/g);
+          const delimitedMessages = extractedMessages ? extractedMessages.join(" ") : "";
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${filteredMessages} : Stage to Master : CHG12345689 RC Release ${currentDate}`
-
-          const { repo, owner } = context.repo;
+          const pullRequestTitle = `${delimitedMessages} : Stage to Master : CHG12345689 RC Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
