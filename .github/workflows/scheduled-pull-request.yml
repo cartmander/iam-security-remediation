@@ -14,6 +14,16 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
+          const commitMessages = await github.rest.repos.listCommits({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+
+          const filteredMessages = commitMessages.data.map(commit => commit.commit.message).filter(message => /DS-[0-9]+/.test(message));
+          const currentDate = new Date().toISOString().split('T')[0];
+
+          const pullRequestTitle = `${filteredMessages} : Stage to Master : CHG12345689 RC Release ${currentDate}`
+
           const { repo, owner } = context.repo;
 
           const pulls = await github.rest.pulls.list({
@@ -26,7 +36,7 @@ jobs:
 
           if (pulls.data.length < 1) {
             await github.rest.pulls.create({
-              title: '[CI] Merge beta into main',
+              title: pullRequestTitle,
               owner: owner,
               repo: repo,
               head: 'stage',
@@ -39,7 +49,7 @@ jobs:
           } else {
             const existingPR = pulls.data[0];
             await github.rest.pulls.update({
-              title: 'Okay new title guys',
+              title: pullRequestTitle,
               owner: owner,
               repo: repo,
               pull_number: existingPR.number,
