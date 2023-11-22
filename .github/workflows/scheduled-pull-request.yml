@@ -25,7 +25,7 @@ jobs:
           const delimitedMessages = extractedMessages ? extractedMessages.join(" ") : "";
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${delimitedMessages} : Stage to Master : CHG12345689 RC Release ${currentDate}`
+          const pullRequestTitle = `DS-1234 DS-5678 : Stage to Master : CHG12345689 RC Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
