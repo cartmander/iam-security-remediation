@@ -52,10 +52,6 @@ jobs:
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              pull_number: existingPR.number,
-              body: [
-                existingPR.body,
-                `Updated by Job ${context.job}`,
-              ].join('\n'),
+              pull_number: existingPR.number
             });
           }
