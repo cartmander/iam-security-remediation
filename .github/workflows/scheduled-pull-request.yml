@@ -24,11 +24,11 @@ jobs:
         
           const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
 
-          const extractedMessages = commitMessages.match(/DS-[0-9]+/g);
-          const delimitedMessages = extractedMessages ? extractedMessages.join(" ") : "";
+          const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
+          const delimitedMessages = extractedMessages.join(" ");
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `DS-1234 DS-5678 : Stage to Master : CHG12345689 RC Release ${currentDate}`
+          const pullRequestTitle = `${delimitedmessages} : Stage to Master : CHG12345689 RC Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
