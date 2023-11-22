@@ -6,6 +6,7 @@ import fs from "fs";
 
 //DS-1234
 //DS-5678
+//Same commit number
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
