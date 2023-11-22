@@ -39,11 +39,10 @@ jobs:
           } else {
             const existingPR = pulls.data[0];
             await github.rest.pulls.update({
+              title: 'Okay new title guys',
               owner: owner,
               repo: repo,
               pull_number: existingPR.number,
-              head: 'stage',
-              base: 'main',
               body: [
                 existingPR.body,
                 `Updated by Job ${context.job}`,
