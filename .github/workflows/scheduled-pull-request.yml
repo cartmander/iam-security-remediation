@@ -16,7 +16,7 @@ jobs:
         script: |
           const { repo, owner } = context.repo;
 
-          const comparison = await github.repos.compareCommits({
+          const comparison = await github.rest.repos.compareCommits({
             owner: owner,
             repo: repo,
             base: 'main',
