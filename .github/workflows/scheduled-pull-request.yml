@@ -25,16 +25,16 @@ jobs:
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
-          const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
-          const delimitedMessages = extractedMessages.join(" ");
+          const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
+          const ticketSummary  = extractedTicketCommits === null ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ");
 
-          if (delimitedMessages === null) {
-            delimitedMessages = 'No potentital commits with ticket numbers yet'
-          }
+          console.log('Commit Messages: ', commitMessages);
+          console.log('Extracted Ticket Commits: ', extractedTicketCommits);
+          console.log('Ticket Summary: ', ticketSummary);
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${delimitedMessages} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
