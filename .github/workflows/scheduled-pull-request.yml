@@ -24,42 +24,44 @@ jobs:
             head: 'stage'
           });
 
-          const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
-          const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
-          const ticketSummary  = extractedTicketCommits === null ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ");
+          if (comparison.data.commits.length > 0) {
+            const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
+            const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
+            const ticketSummary  = extractedTicketCommits === null ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ");
 
-          console.log('Commit Messages: ', commitMessages);
-          console.log('Extracted Ticket Commits: ', extractedTicketCommits);
-          console.log('Ticket Summary: ', ticketSummary);
+            console.log('Commit Messages: ', commitMessages);
+            console.log('Extracted Ticket Commits: ', extractedTicketCommits);
+            console.log('Ticket Summary: ', ticketSummary);
 
-          const currentDate = new Date().toISOString().split('T')[0];
+            const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
+            const pullRequestTitle = `${ticketSummary} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
 
-          const pulls = await github.rest.pulls.list({
-              owner: owner,
-              repo: repo,
-              head: 'stage',
-              base: 'main',
-              state: 'open',
-          });
-
-          if (pulls.data.length < 1) {
-            await github.rest.pulls.create({
-              title: pullRequestTitle,
-              owner: owner,
-              repo: repo,
-              head: 'stage',
-              base: 'main'
+            const pulls = await github.rest.pulls.list({
+                owner: owner,
+                repo: repo,
+                head: 'stage',
+                base: 'main',
+                state: 'open',
             });
-          } 
-          
-          else {
-            const existingPR = pulls.data[0];
-            await github.rest.pulls.update({
-              title: pullRequestTitle,
-              owner: owner,
-              repo: repo,
-              pull_number: existingPR.number
-            });
+
+            if (pulls.data.length < 1) {
+              await github.rest.pulls.create({
+                title: pullRequestTitle,
+                owner: owner,
+                repo: repo,
+                head: 'stage',
+                base: 'main'
+              });
+            } 
+            
+            else {
+              const existingPR = pulls.data[0];
+              await github.rest.pulls.update({
+                title: pullRequestTitle,
+                owner: owner,
+                repo: repo,
+                pull_number: existingPR.number
+              });
+            }
           }
