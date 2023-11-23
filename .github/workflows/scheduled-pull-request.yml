@@ -19,7 +19,8 @@ jobs:
           const commits = await github.rest.repos.listCommits({
             owner: owner,
             repo: repo,
-            sha: 'stage'
+            sha: 'stage',
+            pull_number: context.payload.pull_request.number
           });
         
           const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
