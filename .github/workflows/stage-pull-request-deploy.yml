@@ -47,7 +47,7 @@ jobs:
 
           console.log('Stage Pull: ', stagePull);
 
-          if (stagePull === null) {
+          if (stagePull === null || stagePull === undefined) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
               owner: owner,

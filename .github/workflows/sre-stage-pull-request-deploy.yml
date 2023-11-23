@@ -45,7 +45,7 @@ jobs:
 
           const sreStagePull = pulls.data.find(pr => pr.head.ref === 'sre-stage');
 
-          if (sreStagePull === null) {
+          if (sreStagePull === null || sreStagePull === undefined) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
               owner: owner,
