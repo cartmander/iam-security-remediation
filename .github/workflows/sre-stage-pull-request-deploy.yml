@@ -43,9 +43,9 @@ jobs:
               state: 'open',
           });
 
-          console.log('Pull Request Data: ', pulls.data);
+          const sreStagePull = pulls.data.find(pr => pr.head.ref === 'sre-stage');
 
-          if (pulls.data.length < 1) {
+          if (sreStagePull === null) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
               owner: owner,
@@ -56,11 +56,10 @@ jobs:
           } 
           
           else {
-            const existingPR = pulls.data[0];
             await github.rest.pulls.update({
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              pull_number: existingPR.number
+              pull_number: sreStagePull.number
             });
           }
