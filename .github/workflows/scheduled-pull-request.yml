@@ -28,7 +28,7 @@ jobs:
           
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
-          const ticketSummary  = extractedMessages === null ? 'No potentital commits with ticket numbers yet' : extractedTicketCommits.join(" ");
+          const ticketSummary  = extractedTicketCommits === null ? 'No potentital commits with ticket numbers yet' : extractedTicketCommits.join(" ");
 
           const currentDate = new Date().toISOString().split('T')[0];
 
