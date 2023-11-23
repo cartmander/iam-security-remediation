@@ -1,8 +1,11 @@
 name: Scheduled Pull Request
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "*/60 * * * *"
+  push:
+    branches:
+      - stage
+  schedule:
+    - cron: "*/60 * * * *"
     
 jobs:
   scheduled-pull-request:
@@ -16,14 +19,14 @@ jobs:
         script: |
           const { repo, owner } = context.repo;
 
-          const commits = await github.rest.repos.listCommits({
+          const comparison = await github.rest.repos.compareCommits({
             owner: owner,
             repo: repo,
-            sha: 'stage',
-            pull_number: context.payload.pull_request.number
+            base: 'main',
+            head: 'stage'
           });
-        
-          const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
+
+          const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
           const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
           const delimitedMessages = extractedMessages.join(" ");
 
@@ -34,7 +37,7 @@ jobs:
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: context.ref,
+              head: 'stage',
               base: 'main',
               state: 'open',
           });
@@ -47,7 +50,9 @@ jobs:
               head: 'stage',
               base: 'main'
             });
-          } else {
+          } 
+          
+          else {
             const existingPR = pulls.data[0];
             await github.rest.pulls.update({
               title: pullRequestTitle,
