@@ -16,39 +16,71 @@ jobs:
         script: |
           const { repo, owner } = context.repo;
 
-          const commits = await github.rest.repos.listCommits({
-            owner: owner,
-            repo: repo,
-            sha: 'stage',
-            pull_number: context.payload.pull_request.number
-          });
-        
-          const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
-          const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
-          const delimitedMessages = extractedMessages.join(" ");
-
-          const currentDate = new Date().toISOString().split('T')[0];
-
-          const pullRequestTitle = `${delimitedMessages} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
-
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: context.ref,
+              head: 'stage',
               base: 'main',
               state: 'open',
           });
 
           if (pulls.data.length < 1) {
             await github.rest.pulls.create({
-              title: pullRequestTitle,
               owner: owner,
               repo: repo,
               head: 'stage',
               base: 'main'
             });
-          } else {
+
+            const pullsAgain = await github.rest.pulls.list({
+                owner: owner,
+                repo: repo,
+                head: 'stage',
+                base: 'main',
+                state: 'open',
+            });
+
+            const newlyCreatedPR = pullsAgain.data[0];
+
+            const commits = await github.rest.repos.listCommits({
+              owner: owner,
+              repo: repo,
+              sha: 'stage',
+              pull_number: newlyCreatedPR.number
+            });
+          
+            const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
+            const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
+            const delimitedMessages = extractedMessages.join(" ");
+
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const pullRequestTitle = `${delimitedMessages} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
+
+            await github.rest.pulls.update({
+              title: pullRequestTitle
+            });
+          } 
+          
+          else {
             const existingPR = pulls.data[0];
+
+            const commits = await github.rest.repos.listCommits({
+              owner: owner,
+              repo: repo,
+              sha: 'stage',
+              pull_number: existingPR.number
+            });
+          
+            const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
+            const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
+            const delimitedMessages = extractedMessages.join(" ");
+
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const pullRequestTitle = `${delimitedMessages} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
+
+            
             await github.rest.pulls.update({
               title: pullRequestTitle,
               owner: owner,
