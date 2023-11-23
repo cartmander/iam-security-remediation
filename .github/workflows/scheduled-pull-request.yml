@@ -1,8 +1,9 @@
 name: Scheduled Pull Request
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "*/60 * * * *"
+  push:
+    branches:
+      - stage
     
 jobs:
   scheduled-pull-request:
@@ -24,7 +25,6 @@ jobs:
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
-          //const commitMessages = commits.data.map(commit => commit.commit.message).join(" ");
           const extractedMessages = [...new Set(commitMessages.match(/DS-[0-9]+/g))];
           const delimitedMessages = extractedMessages.join(" ");
 
