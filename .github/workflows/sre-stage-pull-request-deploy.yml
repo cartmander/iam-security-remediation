@@ -1,9 +1,9 @@
-name: Scheduled Pull Request
+name: Prepare SRE-Stage Pull Request for CI/CD Release Deployment
 on:
   workflow_dispatch:
   push:
     branches:
-      - stage
+      - sre-stage
     
 jobs:
   scheduled-pull-request:
@@ -21,7 +21,7 @@ jobs:
             owner: owner,
             repo: repo,
             base: 'main',
-            head: 'stage'
+            head: 'sre-stage'
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
@@ -34,12 +34,12 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : Stage to Master : [insert RFC ticket] RC Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : SRE-Stage to Master : [insert RFC ticket] CI/CD Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: 'stage',
+              head: 'sre-stage',
               base: 'main',
               state: 'open',
           });
@@ -49,7 +49,7 @@ jobs:
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              head: 'stage',
+              head: 'sre-stage',
               base: 'main'
             });
           } 
