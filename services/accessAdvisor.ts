@@ -4,8 +4,7 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-//DS-9999
-//DS-0000
+//Not a ticket commit
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
