@@ -4,9 +4,6 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-//Non ticket commit
-//DS-6789 - Stage ticket
-
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
     Arn: arn,
