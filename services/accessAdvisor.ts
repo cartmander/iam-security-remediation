@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 
 //DS-9999
+//DS-0000
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
