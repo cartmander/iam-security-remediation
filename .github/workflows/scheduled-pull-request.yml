@@ -1,8 +1,8 @@
 name: Scheduled Pull Request
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/60 * * * *"
+  # schedule:
+  #   - cron: "*/60 * * * *"
     
 jobs:
   scheduled-pull-request:
