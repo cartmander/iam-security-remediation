@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - stage
+  schedule:
+    - cron: "*/60 * * * *"
     
 jobs:
   scheduled-pull-request:
