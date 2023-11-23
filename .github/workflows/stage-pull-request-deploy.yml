@@ -45,6 +45,8 @@ jobs:
 
           const stagePull = pulls.data.find(pr => pr.head.ref === 'stage');
 
+          console.log('Stage Pull:', stagePull);
+
           if (stagePull === null) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
