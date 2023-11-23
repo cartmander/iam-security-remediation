@@ -15,23 +15,12 @@ jobs:
       with:
         script: |
           const { repo, owner } = context.repo;
-          const { pull_request } = context.payload;
-          const prNumber = pull_request.number;
-
-          const commits = await github.rest.repos.listCommits({
-            owner: owner,
-            repo: repo,
-            sha: 'stage',
-            pull_number: prNumber
-          });
-
-          const baseBranch = pull_request.base.ref;
 
           const comparison = await github.repos.compareCommits({
             owner: owner,
             repo: repo,
-            base: baseBranch,
-            head: commits.data[0].sha
+            base: 'main',
+            head: 'stage'
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
