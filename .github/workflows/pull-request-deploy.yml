@@ -90,9 +90,10 @@ jobs:
               owner: owner,
               repo: repo,
               base: 'main',
-              head: branch,
-              reviewers: ['ubreakifix/dev-ops', 'kevinnicholasalmario']
+              head: branch
             });
+
+            findPull = pulls.data.find(pr => pr.head.ref === branch);
           } 
           
           else {
@@ -101,6 +102,12 @@ jobs:
               owner: owner,
               repo: repo,
               pull_number: findPull.number,
-              reviewers: ['ubreakifix/dev-ops', 'kevinnicholasalmario']
             });
           }
+
+          await github.rest.pulls.createReviewRequest({
+            owner: owner,
+            repo: repo,
+            pull_number: findPull.number,
+            reviewers: ['ubreakifix/dev-ops', 'kevinnicholasalmario']
+          });
