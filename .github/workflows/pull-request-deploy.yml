@@ -1,16 +1,34 @@
-name: Prepare SRE-Stage Pull Request for CI/CD Release Deployment
+name: Prepare Pull Request for Release Deployment
 on:
   workflow_dispatch:
   push:
     branches:
+      - stage
       - sre-stage
     
 jobs:
-  scheduled-pull-request:
+  pull-request-deploy:
     runs-on: common-8gb
+    strategy:
+      matrix:
+        branch: [stage, sre-stage]
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Set Branch Variable
+      run: echo "BRANCH=${{ matrix.branch }}" >> $GITHUB_ENV
+
+    - name: Set Custom Variables
+      run: |
+        if [ "${{ matrix.branch }}" = "stage" ]; then
+          echo "DISPLAY_BRANCH=Stage" >> $GITHUB_ENV
+          echo "RELEASE_TYPE=RC" >> $GITHUB_ENV
+        elif [ "${{ matrix.branch }}" = "sre-stage" ] then
+          echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_ENV
+          echo "RELEASE_TYPE=CI/CD" >> $GITHUB_ENV
+        fi
+
     - name: Create Pull Request
       uses: actions/github-script@v6
       with:
@@ -20,8 +38,8 @@ jobs:
           const comparison = await github.rest.repos.compareCommits({
             owner: owner,
             repo: repo,
-            base: 'main',
-            head: 'sre-stage'
+            base: 'master',
+            head: $BRANCH
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
@@ -33,25 +51,25 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : SRE-Stage to Master : [insert RFC ticket] CI/CD Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : $DISPLAY_BRANCH to Master : [insert RFC ticket] $RELEASE_TYPE Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: 'sre-stage',
               base: 'main',
+              head: $BRANCH,
               state: 'open',
           });
 
-          const sreStagePull = pulls.data.find(pr => pr.head.ref === 'sre-stage');
+          const findPull = pulls.data.find(pr => pr.head.ref === $BRANCH);
 
-          if (sreStagePull === null || sreStagePull === undefined) {
+          if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              head: 'sre-stage',
-              base: 'main'
+              base: 'main',
+              head: $BRANCH
             });
           } 
           
@@ -60,6 +78,6 @@ jobs:
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              pull_number: sreStagePull.number
+              pull_number: findPull.number
             });
           }
