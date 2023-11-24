@@ -90,7 +90,8 @@ jobs:
               owner: owner,
               repo: repo,
               base: 'main',
-              head: branch
+              head: branch,
+              reviewers: ['ubreakifix/dev-ops']
             });
           } 
           
@@ -99,6 +100,7 @@ jobs:
               title: pullRequestTitle,
               owner: owner,
               repo: repo,
-              pull_number: findPull.number
+              pull_number: findPull.number,
+              reviewers: ['ubreakifix/dev-ops']
             });
           }
