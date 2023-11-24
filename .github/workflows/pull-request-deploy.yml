@@ -26,16 +26,18 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set Branch Variable
-      run: echo "BRANCH=${{ matrix.branch }}" >> $GITHUB_ENV
+      id: set_branch_variable
+      run: echo "BRANCH=${{ matrix.branch }}" >> $GITHUB_OUTPUT
 
     - name: Set Custom Variables
+      id: set_custom_variables
       run: |
-        if [ "${{ matrix.branch }}" == "stage" ]; then
-          echo "DISPLAY_BRANCH=Stage" >> $GITHUB_ENV
-          echo "RELEASE_TYPE=RC" >> $GITHUB_ENV
-        elif [ "${{ matrix.branch }}" == "sre-stage" ]; then
-          echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_ENV
-          echo "RELEASE_TYPE=CI/CD" >> $GITHUB_ENV
+        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" ]; then
+          echo "DISPLAY_BRANCH=Stage" >> $GITHUB_OUTPUT
+          echo "RELEASE_TYPE=RC" >> $GITHUB_OUTPUT
+        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" ]; then
+          echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_OUTPUT
+          echo "RELEASE_TYPE=CI/CD" >> $GITHUB_OUTPUT
         fi
 
     - name: Create Pull Request
@@ -48,7 +50,7 @@ jobs:
             owner: owner,
             repo: repo,
             base: 'main',
-            head: $BRANCH
+            head: ${{ steps.set_branch_variable.outputs.BRANCH }}
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
@@ -60,17 +62,17 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : $DISPLAY_BRANCH to Master : [insert RFC ticket] $RELEASE_TYPE Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : ${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }} to Master : [insert RFC ticket] ${{ steps.set_custom_variables.outputs.RELEASE_TYPE }} Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
               base: 'main',
-              head: $BRANCH,
+              head: ${{ steps.set_branch_variable.outputs.BRANCH }},
               state: 'open',
           });
 
-          const findPull = pulls.data.find(pr => pr.head.ref === $BRANCH);
+          const findPull = pulls.data.find(pr => pr.head.ref === ${{ steps.set_branch_variable.outputs.BRANCH }});
 
           if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
@@ -78,7 +80,7 @@ jobs:
               owner: owner,
               repo: repo,
               base: 'main',
-              head: $BRANCH
+              head: ${{ steps.set_branch_variable.outputs.BRANCH }}
             });
           } 
           
