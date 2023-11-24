@@ -64,19 +64,18 @@ jobs:
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
-          const revertCommits = commitMessages.match(/\bREVERT\b/gi);
+          const revertCommits = [...new Set(commitMessages.match(/\bREVERT\b/gi))];
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
           const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ").toUpperCase();
+          const revertCommitsSummary = revertCommits.length != 0 ? [REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY] : "";
 
           console.log('Commit Messages: ', commitMessages);
-          console.log('Reverted Commit Messages: ', revertCommits);
+          console.log('Reverted Commits Summary: ', revertCommitsSummary);
           console.log('Ticket Summary: ', ticketSummary);
-
-          const revertCommitHeader = revertCommits !== null ? [REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY] : "";
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${revertCommitHeader} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
+          const pullRequestTitle = `${revertCommitsSummary} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
