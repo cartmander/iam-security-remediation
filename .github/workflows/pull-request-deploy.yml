@@ -1,9 +1,17 @@
 name: Prepare Pull Request for Release Deployment
+
 on:
   workflow_dispatch:
-    branches:
-      - stage
-      - sre-stage
+    inputs:
+      branch:
+        description: 'Choose a branch:'
+        required: true
+        default: stage
+        type: choice
+        options:
+          - stage
+          - sre-stage
+
   push:
     branches:
       - stage
@@ -12,37 +20,42 @@ on:
 jobs:
   pull-request-deploy:
     runs-on: common-8gb
-    strategy:
-      matrix:
-        branch: [stage, sre-stage]
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set Branch Variable
-      run: echo "BRANCH=${{ matrix.branch }}" >> $GITHUB_ENV
+      id: set_branch_variable
+      run: echo "BRANCH=${{ inputs.branch || github.event.ref }}" >> $GITHUB_OUTPUT
 
     - name: Set Custom Variables
+      id: set_custom_variables
       run: |
-        if [ "${{ matrix.branch }}" = "stage" ]; then
-          echo "DISPLAY_BRANCH=Stage" >> $GITHUB_ENV
-          echo "RELEASE_TYPE=RC" >> $GITHUB_ENV
-        elif [ "${{ matrix.branch }}" = "sre-stage" ]; then
-          echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_ENV
-          echo "RELEASE_TYPE=CI/CD" >> $GITHUB_ENV
+        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" ]; then
+          echo "DISPLAY_BRANCH=Stage" >> $GITHUB_OUTPUT
+          echo "RELEASE_TYPE=RC" >> $GITHUB_OUTPUT
+        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" ]; then
+          echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_OUTPUT
+          echo "RELEASE_TYPE=CI/CD" >> $GITHUB_OUTPUT
         fi
 
     - name: Create Pull Request
       uses: actions/github-script@v6
       with:
         script: |
+        
+          const branch = '${{ steps.set_branch_variable.outputs.BRANCH }}'
+          const displayBranch = '${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}'
+          const releaseType = '${{ steps.set_custom_variables.outputs.RELEASE_TYPE }}'
+          
           const { repo, owner } = context.repo;
 
           const comparison = await github.rest.repos.compareCommits({
             owner: owner,
             repo: repo,
             base: 'main',
-            head: $BRANCH
+            head: branch
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
@@ -54,17 +67,17 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : $DISPLAY_BRANCH to Master : [insert RFC ticket] $RELEASE_TYPE Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
               base: 'main',
-              head: $BRANCH,
+              head: branch,
               state: 'open',
           });
 
-          const findPull = pulls.data.find(pr => pr.head.ref === $BRANCH);
+          const findPull = pulls.data.find(pr => pr.head.ref === branch);
 
           if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
@@ -72,7 +85,7 @@ jobs:
               owner: owner,
               repo: repo,
               base: 'main',
-              head: $BRANCH
+              head: branch
             });
           } 
           
