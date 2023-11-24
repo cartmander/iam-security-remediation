@@ -79,6 +79,8 @@ jobs:
 
           const findPull = pulls.data.find(pr => pr.head.ref === branch);
 
+          console.log('Pull: ', findPull);
+
           if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
               title: pullRequestTitle,
