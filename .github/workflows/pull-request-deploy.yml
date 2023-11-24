@@ -32,10 +32,10 @@ jobs:
     - name: Set Custom Variables
       id: set_custom_variables
       run: |
-        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" ]; then
+        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" || "${{ steps.set_branch_variable.outputs.BRANCH }}" == "refs/heads/stage" ]; then
           echo "DISPLAY_BRANCH=Stage" >> $GITHUB_OUTPUT
           echo "RELEASE_TYPE=RC" >> $GITHUB_OUTPUT
-        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" ]; then
+        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" || "${{ steps.set_branch_variable.outputs.BRANCH }}" == "refs/heads/sre-stage" ]; then
           echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_OUTPUT
           echo "RELEASE_TYPE=CI/CD" >> $GITHUB_OUTPUT
         fi
@@ -78,8 +78,6 @@ jobs:
           });
 
           const findPull = pulls.data.find(pr => pr.head.ref === branch);
-
-          console.log('Pull: ', findPull);
 
           if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
