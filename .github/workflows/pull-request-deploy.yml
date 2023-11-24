@@ -18,14 +18,14 @@ on:
 jobs:
   pull-request-deploy:
     runs-on: common-8gb
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set Branch Variable
       id: set_branch_variable
-      run: echo "BRANCH=${{ inputs.branch || ref_name }}" >> $GITHUB_OUTPUT
+      run: echo "BRANCH=${{ inputs.branch || ref }}" >> $GITHUB_OUTPUT
 
     - name: Set Custom Variables
       id: set_custom_variables
