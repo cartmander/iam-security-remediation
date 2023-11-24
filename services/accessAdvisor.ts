@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 
 // No ticket commit
+// DS-1234
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
