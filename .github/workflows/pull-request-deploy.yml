@@ -11,7 +11,7 @@ on:
         options:
           - stage
           - sre-stage
-          
+
   push:
     branches:
       - stage
@@ -45,9 +45,9 @@ jobs:
       with:
         script: |
         
-          const branch = ${{ steps.set_branch_variable.outputs.BRANCH }}
-          const displayBranch = ${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}
-          const releaseType = ${{ steps.set_custom_variables.outputs.RELEASE_TYPE }}
+          const branch = '${{ steps.set_branch_variable.outputs.BRANCH }}'
+          const displayBranch = '${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}'
+          const releaseType = '${{ steps.set_custom_variables.outputs.RELEASE_TYPE }}'
           
           const { repo, owner } = context.repo;
 
