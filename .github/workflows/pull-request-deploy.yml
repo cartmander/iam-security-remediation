@@ -62,7 +62,7 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : "${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}" to Master : [insert RFC ticket] "${{ steps.set_custom_variables.outputs.RELEASE_TYPE }}" Release ${currentDate}`
+          const pullRequestTitle = `${ticketSummary} : ${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }} to Master : [insert RFC ticket] "${{ steps.set_custom_variables.outputs.RELEASE_TYPE }}" Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
