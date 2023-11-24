@@ -1,9 +1,14 @@
 name: Prepare Pull Request for Release Deployment
 on:
   workflow_dispatch:
-    branches:
-      - stage
-      - sre-stage
+    inputs:
+      branch:
+        description: 'Choose a branch:'
+        required: true
+        default: stage
+        options:
+          - stage
+          - sre-stage
   push:
     branches:
       - stage
