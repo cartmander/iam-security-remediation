@@ -30,10 +30,10 @@ jobs:
 
     - name: Set Custom Variables
       run: |
-        if [ "${{ matrix.branch }}" = "stage" ]; then
+        if [ "${{ matrix.branch }}" == "stage" ]; then
           echo "DISPLAY_BRANCH=Stage" >> $GITHUB_ENV
           echo "RELEASE_TYPE=RC" >> $GITHUB_ENV
-        elif [ "${{ matrix.branch }}" = "sre-stage" ]; then
+        elif [ "${{ matrix.branch }}" == "sre-stage" ]; then
           echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_ENV
           echo "RELEASE_TYPE=CI/CD" >> $GITHUB_ENV
         fi
