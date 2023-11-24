@@ -64,15 +64,19 @@ jobs:
           });
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
+          const revertCommits = commitMessages.match(/\bREVERT\b/gi);
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
           const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ").toUpperCase();
 
           console.log('Commit Messages: ', commitMessages);
+          console.log('Reverted Commit Messages: ', revertCommits);
           console.log('Ticket Summary: ', ticketSummary);
+
+          const revertCommitHeader = revertCommits !== null ? [REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY] : "";
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
+          const pullRequestTitle = `${revertCommitHeader} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
