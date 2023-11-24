@@ -27,7 +27,12 @@ jobs:
 
     - name: Set Branch Variable
       id: set_branch_variable
-      run: echo "BRANCH=${{ inputs.branch || github.event.ref }}" >> $GITHUB_OUTPUT
+      run: |
+        if [ "${{ inputs.branch }}" == "stage" ] || [ "${{ github.event.ref }}" == "refs/heads/stage" ]; then
+          echo "BRANCH=stage" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.branch }}" == "sre-stage" ] || [ "${{ github.event.ref }}" == "refs/heads/sre-stage" ]; then
+          echo "BRANCH=sre-stage" >> $GITHUB_OUTPUT
+        fi
 
     - name: Set Custom Variables
       id: set_custom_variables
