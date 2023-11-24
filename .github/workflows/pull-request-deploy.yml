@@ -65,7 +65,7 @@ jobs:
 
           const commitMessages = comparison.data.commits.map(commit => commit.commit.message).join(" ");
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
-          const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ");
+          const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.toUpperCase().join(" ");
 
           console.log('Commit Messages: ', commitMessages);
           console.log('Ticket Summary: ', ticketSummary);
