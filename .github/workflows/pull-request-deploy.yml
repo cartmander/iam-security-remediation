@@ -27,15 +27,20 @@ jobs:
 
     - name: Set Branch Variable
       id: set_branch_variable
-      run: echo "BRANCH=${{ inputs.branch || github.event.ref }}" >> $GITHUB_OUTPUT
+      run: |
+        if [ "${{ inputs.branch || github.event.ref }}" == "stage" ]; then
+          echo "BRANCH=stage" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.branch || github.event.ref }}" == "sre-stage" ]; then
+          echo "BRANCH=sre-stage" >> $GITHUB_OUTPUT
+        fi
 
     - name: Set Custom Variables
       id: set_custom_variables
       run: |
-        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" || "${{ steps.set_branch_variable.outputs.BRANCH }}" == "refs/heads/stage" ]; then
+        if [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "stage" ]; then
           echo "DISPLAY_BRANCH=Stage" >> $GITHUB_OUTPUT
           echo "RELEASE_TYPE=RC" >> $GITHUB_OUTPUT
-        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" || "${{ steps.set_branch_variable.outputs.BRANCH }}" == "refs/heads/sre-stage" ]; then
+        elif [ "${{ steps.set_branch_variable.outputs.BRANCH }}" == "sre-stage" ]; then
           echo "DISPLAY_BRANCH=SRE-Stage" >> $GITHUB_OUTPUT
           echo "RELEASE_TYPE=CI/CD" >> $GITHUB_OUTPUT
         fi
