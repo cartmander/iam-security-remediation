@@ -91,7 +91,7 @@ jobs:
               repo: repo,
               base: 'main',
               head: branch,
-              reviewers: ['ubreakifix/dev-ops']
+              reviewers: ['ubreakifix/dev-ops', 'kevinnicholasalmario']
             });
           } 
           
@@ -101,6 +101,6 @@ jobs:
               owner: owner,
               repo: repo,
               pull_number: findPull.number,
-              reviewers: ['ubreakifix/dev-ops']
+              reviewers: ['ubreakifix/dev-ops', 'kevinnicholasalmario']
             });
           }
