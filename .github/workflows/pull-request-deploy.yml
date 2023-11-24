@@ -1,6 +1,9 @@
 name: Prepare Pull Request for Release Deployment
 on:
   workflow_dispatch:
+    branches:
+      - stage
+      - sre-stage
   push:
     branches:
       - stage
@@ -38,7 +41,7 @@ jobs:
           const comparison = await github.rest.repos.compareCommits({
             owner: owner,
             repo: repo,
-            base: 'master',
+            base: 'main',
             head: $BRANCH
           });
 
