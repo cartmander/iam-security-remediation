@@ -70,7 +70,7 @@ jobs:
           const revertCommitsSummary = revertCommits.length != 0 ? '[REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY]' : "";
 
           console.log('Commit Messages: ', commitMessages);
-          console.log('Reverted Commits Summary: ', revertCommitsSummary);
+          console.log('Reverted Commits Summary: ', revertCommits);
           console.log('Ticket Summary: ', ticketSummary);
 
           const currentDate = new Date().toISOString().split('T')[0];
