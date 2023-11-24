@@ -67,7 +67,8 @@ jobs:
           const revertCommits = [...new Set(commitMessages.match(/\bREVERT\b/gi))];
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
           const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ").toUpperCase();
-          const revertCommitsSummary = revertCommits.length != 0 ? '[REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY]' : "";
+          const revertCommitsLabel = revertCommits.length != 0 ? 'Revert commit/s detected. Please review tickets manually' : "No revert commit/s detected";
+          const revertCommitsLabelColor = revertCommits.length != 0 ? 'ff0000' : '008000';
 
           console.log('Commit Messages: ', commitMessages);
           console.log('Reverted Commits Summary: ', revertCommits);
@@ -75,7 +76,7 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${revertCommitsSummary} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`;
+          const pullRequestTitle = `${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`;
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
@@ -93,7 +94,11 @@ jobs:
               owner: owner,
               repo: repo,
               base: 'main',
-              head: branch
+              head: branch,
+              labels: [{
+                name: revertCommitsLabel,
+                color: revertCommitsLabelColor
+              }]
             });
 
             findPull = pulls.data.find(pr => pr.head.ref === branch);
@@ -105,5 +110,9 @@ jobs:
               owner: owner,
               repo: repo,
               pull_number: findPull.number,
+              labels: [{
+                name: revertCommitsLabel,
+                color: revertCommitsLabelColor
+              }]
             });
           }
