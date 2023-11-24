@@ -28,9 +28,9 @@ jobs:
     - name: Set Branch Variable
       id: set_branch_variable
       run: |
-        if [ "${{ inputs.branch || github.event.ref }}" == "stage" ]; then
+        if [ "${{ inputs.branch }}" == "stage" ] || [ "${{ github.event.ref }} == "refs/heads/stage" ]; then
           echo "BRANCH=stage" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.branch || github.event.ref }}" == "sre-stage" ]; then
+        elif [ "${{ inputs.branch }}" == "sre-stage" ] || [ "${{ github.event.ref }} == "refs/heads/sre-stage" ]; then
           echo "BRANCH=sre-stage" >> $GITHUB_OUTPUT
         fi
 
