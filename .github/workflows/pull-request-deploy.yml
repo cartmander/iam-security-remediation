@@ -75,7 +75,7 @@ jobs:
 
           const currentDate = new Date().toISOString().split('T')[0];
 
-          const pullRequestTitle = `${revertCommitsSummary} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`
+          const pullRequestTitle = `${revertCommitsSummary} ${ticketSummary} : ${displayBranch} to Master : [insert RFC ticket] ${releaseType} Release ${currentDate}`;
 
           const pulls = await github.rest.pulls.list({
               owner: owner,
