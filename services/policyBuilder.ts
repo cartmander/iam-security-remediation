@@ -4,9 +4,6 @@ import path from "path";
 import fs from "fs";
 
 // SRE-Stage
-// No tickets yet
-// DS-3333
-// DS-4444
 
 const generateEmptyBasePolicy = (): BasePolicy =>  {
   return {
