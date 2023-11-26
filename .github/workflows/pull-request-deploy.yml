@@ -85,7 +85,7 @@ jobs:
               state: 'open',
           });
 
-          const findPull = pulls.data.find(pr => pr.head.ref === branch);
+          let findPull = pulls.data.find(pr => pr.head.ref === branch);
 
           if (findPull === null || findPull === undefined) {
             await github.rest.pulls.create({
