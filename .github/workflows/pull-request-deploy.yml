@@ -67,7 +67,7 @@ jobs:
           const revertCommits = [...new Set(commitMessages.match(/\bREVERT\b/gi))];
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
           const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ").toUpperCase();
-          const revertCommitsSummary = revertCommits.length != 0 ? '[REVERT COMMIT/S DETECTED PLEASE REVIEW TICKETS MANUALLY]' : "";
+          const revertCommitsSummary = revertCommits.length != 0 ? 'Revert commit/s detected. Please review tickets manually' : 'No revert commits detected';
 
           console.log('Commit Messages: ', commitMessages);
           console.log('Reverted Commits Summary: ', revertCommits);
@@ -97,6 +97,13 @@ jobs:
             });
 
             findPull = pulls.data.find(pr => pr.head.ref === branch);
+
+            await github.issues.addLabels({
+              owner: owner,
+              repo: repo,
+              issue_number: findPull.number,
+              labels: [revertCommitsSummary]
+            });
           } 
           
           else {
