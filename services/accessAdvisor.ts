@@ -5,9 +5,6 @@ import path from "path";
 import fs from "fs";
 
 // Stage
-// No tickets yet
-// DS-1111
-// DS-2222 
 
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
