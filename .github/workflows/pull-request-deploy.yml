@@ -102,7 +102,7 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: findPull.number,
-              labels: [revertCommitsSummary]
+              labels: ['automated pr']
             });
           } 
           
