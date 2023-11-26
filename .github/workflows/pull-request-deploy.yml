@@ -85,7 +85,7 @@ jobs:
               state: 'open',
           });
 
-          let findPull = pulls.data.find(pr => pr.head.ref === branch);
+          const findPull = pulls.data.find(pr => pr.head.ref === branch);
 
           if (findPull === null || findPull === undefined) {
             const createPull = await github.rest.pulls.create({
@@ -96,12 +96,10 @@ jobs:
               head: branch
             });
 
-            createdPull = createPull.data.find(pr => pr.head.ref === branch);
-
             await github.rest.issues.addLabels({
               owner: owner,
               repo: repo,
-              issue_number: createdPull.number,
+              issue_number: createPull.data.number,
               labels: [revertCommitsSummary]
             });
           } 
