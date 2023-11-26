@@ -113,7 +113,7 @@ jobs:
             });
 
             if (revertCommitsSummary === 'revert commit detected') {
-              const currentLabels = await github.rest.issues.listLabelsonIssue({
+              const currentLabels = await github.rest.issues.listLabelsOnIssue({
                 owner: owner,
                 repo: repo,
                 issue_number: findPull.number
