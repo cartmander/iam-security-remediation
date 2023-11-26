@@ -96,8 +96,12 @@ jobs:
               head: branch
             });
 
-            console.log('Create Pull: ', createPull);
-            findPull = pulls.data.find(pr => pr.head.ref === branch);
+            await github.rest.issues.addLabels({
+              owner: owner,
+              repo: repo,
+              issue_number: createPull.number,
+              labels: [revertCommitsSummary]
+            });
           } 
           
           else {
@@ -107,13 +111,11 @@ jobs:
               repo: repo,
               pull_number: findPull.number,
             });
+
+            await github.rest.issues.addLabels({
+              owner: owner,
+              repo: repo,
+              issue_number: findPull.number,
+              labels: [revertCommitsSummary]
+            });
           }
-
-          console.log('Found Pull Request: ', findPull);
-
-          await github.rest.issues.addLabels({
-            owner: owner,
-            repo: repo,
-            issue_number: findPull.number,
-            labels: [revertCommitsSummary]
-          });
