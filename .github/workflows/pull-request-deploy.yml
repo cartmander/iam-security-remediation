@@ -67,7 +67,7 @@ jobs:
           const revertCommits = [...new Set(commitMessages.match(/\bREVERT\b/gi))];
           const extractedTicketCommits = [...new Set(commitMessages.match(/DS-[0-9]+/gi))];
           const ticketSummary  = extractedTicketCommits.length == 0 ? '[No commits with ticket numbers yet]' : extractedTicketCommits.join(" ").toUpperCase();
-          const revertCommitsSummary = revertCommits.length != 0 ? 'Revert commit/s detected. Please review tickets manually' : 'No revert commits detected';
+          const revertCommitsSummary = revertCommits.length != 0 ? 'revert commit detected' : 'no revert commit detected';
 
           console.log('Commit Messages: ', commitMessages);
           console.log('Reverted Commits Summary: ', revertCommits);
