@@ -62,7 +62,10 @@ jobs:
           const { Octokit } = require('@octokit/rest');
           const nodeFetch = require('node-fetch');
 
+          const token = ${{ secrets.ORG_GITHUB_PACKAGES_READER }};
+
           const octokit = new Octokit({
+            auth: token
             request: {
               fetch: nodeFetch
             }
