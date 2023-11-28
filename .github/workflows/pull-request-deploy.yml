@@ -102,6 +102,13 @@ jobs:
               issue_number: createPull.data.number,
               labels: [revertCommitsSummary]
             });
+
+            await octokit.pulls.createReviewRequest({
+              owner: owner,
+              repo: repo,
+              pull_number: createPull.data.number,
+              reviewers: ['kevinnicholasalmario']
+            });
           } 
           
           else {
@@ -110,6 +117,13 @@ jobs:
               owner: owner,
               repo: repo,
               pull_number: findPull.number,
+            });
+
+            await octokit.pulls.createReviewRequest({
+              owner: owner,
+              repo: repo,
+              pull_number: findPull.number,
+              reviewers: ['kevinnicholasalmario']
             });
 
             if (revertCommitsSummary === 'revert commit detected') {
