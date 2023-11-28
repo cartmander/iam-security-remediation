@@ -32,8 +32,8 @@ jobs:
         always-auth: true
         node-version: 18
 
-    - name: Install Octokit
-      run: npm install @octokit/rest
+    - name: Install packages
+      run: npm install @octokit/rest node-fetch
 
     - name: Set Branch Variable
       id: set_branch_variable
@@ -60,8 +60,13 @@ jobs:
       with:
         script: |
           const { Octokit } = require('@octokit/rest');
+          const fetch = require('node-fetch');
 
-          const octokit = new Octokit();
+          const octokit = new Octokit({
+            request: {
+              fetch: fetch
+            }
+          });
         
           const branch = '${{ steps.set_branch_variable.outputs.BRANCH }}';
           const displayBranch = '${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}';
