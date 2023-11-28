@@ -116,7 +116,7 @@ jobs:
               labels: [revertCommitsSummary]
             });
 
-            await octokit.pulls.createReviewRequest({
+            await octokit.pulls.requestReviewers({
               owner: owner,
               repo: repo,
               pull_number: createPull.data.number,
@@ -132,7 +132,7 @@ jobs:
               pull_number: findPull.number,
             });
 
-            await octokit.pulls.createReviewRequest({
+            await octokit.pulls.requestReviewers({
               owner: owner,
               repo: repo,
               pull_number: findPull.number,
