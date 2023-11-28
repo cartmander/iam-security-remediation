@@ -59,17 +59,17 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          # const { Octokit } = require('@octokit/rest');
-          # const nodeFetch = require('node-fetch');
+          // const { Octokit } = require('@octokit/rest');
+          // const nodeFetch = require('node-fetch');
 
-          # const token = '${{ secrets.ORG_GITHUB_PACKAGES_READER }}';
+          // const token = '${{ secrets.ORG_GITHUB_PACKAGES_READER }}';
 
-          # const octokit = new Octokit({
-          #   auth: token
-          #   request: {
-          #     fetch: nodeFetch
-          #   }
-          # });
+          // const octokit = new Octokit({
+          //   auth: token
+          //   request: {
+          //     fetch: nodeFetch
+          //   }
+          // });
         
           const branch = '${{ steps.set_branch_variable.outputs.BRANCH }}';
           const displayBranch = '${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}';
@@ -124,12 +124,12 @@ jobs:
               labels: [revertCommitsSummary]
             });
 
-            # await octokit.pulls.requestReviewers({
-            #   owner: owner,
-            #   repo: repo,
-            #   pull_number: createPull.data.number,
-            #   reviewers: ['kevinnicholasalmario']
-            # });
+            // await octokit.pulls.requestReviewers({
+            //   owner: owner,
+            //   repo: repo,
+            //   pull_number: createPull.data.number,
+            //   reviewers: ['kevinnicholasalmario']
+            // });
           } 
           
           else {
@@ -140,12 +140,12 @@ jobs:
               pull_number: findPull.number,
             });
 
-            # await octokit.pulls.requestReviewers({
-            #   owner: owner,
-            #   repo: repo,
-            #   pull_number: findPull.number,
-            #   reviewers: ['kevinnicholasalmario']
-            # });
+            // await octokit.pulls.requestReviewers({
+            //   owner: owner,
+            //   repo: repo,
+            //   pull_number: findPull.number,
+            //   reviewers: ['kevinnicholasalmario']
+            // });
 
             if (revertCommitsSummary === 'revert commit detected') {
               const currentLabels = await github.rest.issues.listLabelsOnIssue({
