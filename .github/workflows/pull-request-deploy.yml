@@ -60,7 +60,7 @@ jobs:
       with:
         script: |
           const { Octokit } = require('@octokit/rest');
-          const nodeFetch = require('node-fetch');
+          import fetch as nodeFetch from 'node-fetch'
 
           const octokit = new Octokit({
             request: {
