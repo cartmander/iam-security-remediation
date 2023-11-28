@@ -60,6 +60,8 @@ jobs:
       with:
         script: |
           const { Octokit } = require('@octokit/rest');
+
+          const octokit = new Octokit();
         
           const branch = '${{ steps.set_branch_variable.outputs.BRANCH }}';
           const displayBranch = '${{ steps.set_custom_variables.outputs.DISPLAY_BRANCH }}';
