@@ -24,6 +24,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    
+    - name: Install Octokit
+      run: npm install @octokit/rest
 
     - name: Set Branch Variable
       id: set_branch_variable
