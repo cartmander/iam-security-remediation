@@ -3,8 +3,6 @@ import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-// SRE-Stage
-
 const generateEmptyBasePolicy = (): BasePolicy =>  {
   return {
       Version: "2012-10-17",
