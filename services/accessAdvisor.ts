@@ -24,9 +24,10 @@ const generateServiceLastAccessedDetails = async ({ arn, granularity }: Generate
 
 const listActions = (listOfActions: string[], service: string, actions: TrackedActionLastAccessed[]): string[] => {
   actions.forEach((action) => {
-    if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null) {
-      listOfActions.push(`${service}:${ action.ActionName }`);
-    }
+    // if (action.LastAccessedEntity != null && action.LastAccessedRegion != null && action.LastAccessedTime != null) {
+    //   listOfActions.push(`${service}:${ action.ActionName }`);
+    // }
+    listOfActions.push(`${service}:${ action.ActionName }`);
   });
 
   return listOfActions;
@@ -92,12 +93,14 @@ export const listServices = (services: ServiceLastAccessed[], roleName: string):
 
   try {
     services.forEach((service) => {
-      if (service.TrackedActionsLastAccessed == null && service.LastAuthenticated != null && service.TotalAuthenticatedEntities != 0) {
-        listofServiceNameSpaces.push(service.ServiceNamespace as string);
-      }
-  
-      if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
-        listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
+      if (service.LastAuthenticated) {
+        if (service.TrackedActionsLastAccessed == null && service.TotalAuthenticatedEntities != 0) {
+          listofServiceNameSpaces.push(service.ServiceNamespace as string);
+        }
+
+        if (service.TrackedActionsLastAccessed != null && service.TrackedActionsLastAccessed.length > 0) {
+          listOfServiceNamespacesAndActions = listOfActions.concat(listActions(actions, service.ServiceNamespace as string, service.TrackedActionsLastAccessed));
+        }
       }
     });
   
