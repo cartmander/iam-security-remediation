@@ -4,12 +4,6 @@ import { client } from "../client.js";
 import path from "path";
 import fs from "fs";
 
-// Stage
-// No ticket kind of change
-// DS-1111
-// DS-1111
-// Let's revert DS-1111
-
 const generateServiceLastAccessedDetails = async ({ arn, granularity }: GenerateServiceLastAccessedDetailsCommandInput): Promise<GenerateServiceLastAccessedDetailsCommandOutput> => { 
   const serviceDetailsCommandInput = {
     Arn: arn,
