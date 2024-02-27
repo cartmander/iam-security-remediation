@@ -43,7 +43,7 @@ const getPolicyDocument = async (policyVersion: string, policyArn: string): Prom
     }
 }
 
-const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string): Promise<any> => {
+const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string, policyArn: string): Promise<any> => {
     try {
         const putRolePolicyCommandInput = {
             PolicyDocument: policyDocument,
@@ -58,7 +58,7 @@ const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleNa
     }
 
     catch (error) {
-        console.error(`Unable to convert Policy Document of this Policy Name: ${policyName} into an inline policy`);
+        console.error(`Unable to convert Policy Document of this Policy ARN: ${policyArn} into an inline policy`);
         return;
     }    
 }
@@ -87,8 +87,7 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
         const policyName = policyVersion.Policy?.PolicyName;
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
-
-        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
+        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName), policyArn;
 
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyArn);
