@@ -87,7 +87,7 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
         const policyName = policyVersion.Policy?.PolicyName;
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
-        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName), policyArn;
+        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName, policyArn);
 
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyArn);
