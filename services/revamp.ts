@@ -53,10 +53,13 @@ const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleNa
 
         const command = new PutRolePolicyCommand(putRolePolicyCommandInput);
         const response = await client.send(command);
+        
+        return response;
     }
 
     catch (error) {
         console.error(`Unable to convert Policy Document of this Policy Name: ${policyName} into an inline policy`);
+        return;
     }    
 }
 
@@ -85,8 +88,11 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
 
-        await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
-        await deleteAWSManagedPolicyInRole(roleName, policyArn);
+        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
+
+        if (convertedPolicyDocument) {
+            await deleteAWSManagedPolicyInRole(roleName, policyArn);
+        }
     }
 
     catch (error) {
