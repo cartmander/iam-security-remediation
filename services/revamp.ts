@@ -1,6 +1,5 @@
 import { AttachRolePolicyCommand, CreatePolicyCommand, GetPolicyCommand, GetPolicyCommandOutput, GetPolicyVersionCommand, ListAttachedRolePoliciesCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
 import { client } from "../client.js";
-import { create } from "domain";
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {
     return policyArn.startsWith("arn:aws:iam::aws:policy/");
