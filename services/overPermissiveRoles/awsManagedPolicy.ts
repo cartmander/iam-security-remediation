@@ -91,7 +91,7 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string)
 
 const convertManagedPolicyToInline = async (roleName: string, policyArn: string): Promise<any> => {
     try {
-        console.log(`Converting AWS managed policy: ${policyArn}`);
+        console.log(`Attempting to convert AWS managed policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
 
@@ -104,6 +104,8 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyArn);
         }
+
+        console.log(`Done attempting to convert AWS managed policy: ${policyArn}`);
     }
 
     catch (error) {
@@ -123,20 +125,18 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
         const attachedPolicies = response.AttachedPolicies || [];
         const AWSManagedPolicyArns = attachedPolicies.filter(policy => isAWSManagedPolicy(policy.PolicyArn || "")).map(policy => policy.PolicyArn);
 
-        console.log(`Processing role: ${roleName}`);
+        console.log(`Attempting to process role: ${roleName}`);
 
         if (AWSManagedPolicyArns.length != 0 ) {
             console.log(`AWS Managed Policies attached to Role ${roleName}`, AWSManagedPolicyArns);
-            AWSManagedPolicyArns.forEach(policy => (convertManagedPolicyToInline(roleName, policy!)));
+            AWSManagedPolicyArns.forEach((policy) => (convertManagedPolicyToInline(roleName, policy!)));
         }
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
         }
 
-        client.destroy();
-        
-        console.log(`Done processing role: ${roleName} and converting its AWS managed policies into inline policies`);
+        console.log(`Done attempting to process role: ${roleName} and its policies`);
     }
 
     catch (error) {
@@ -144,10 +144,10 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
     }
 }
 
-const processAWSManagedPolicyRemediation = (error: any, csvRecords: any) => {
+const processAWSManagedPolicyRemediation = async (error: any, csvRecords: any) => {
     for (let record in csvRecords) {
       const { RoleName, Arn } = csvRecords[record];
-      getAWSManagedPoliciesForRole(RoleName);
+      await getAWSManagedPoliciesForRole(RoleName);
     }
 }
 
