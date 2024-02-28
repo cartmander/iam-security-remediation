@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "generate": "tsc && node dist/index.js",
-    "poc": "tsc && node dist/services/revamp.js",
+    "awsManagedRoles": "tsc && node dist/services/overPermissiveRoles/awsManagedPolicy.js",
     "file": "tsc && node dist/services/getRoles.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

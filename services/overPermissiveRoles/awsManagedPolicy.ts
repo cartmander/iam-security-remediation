@@ -1,5 +1,15 @@
-import { DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, ListAttachedRolePoliciesCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
-import { client } from "../client.js";
+import { 
+    DetachRolePolicyCommand, 
+    GetPolicyCommand, 
+    GetPolicyVersionCommand, 
+    ListAttachedRolePoliciesCommand, 
+    PutRolePolicyCommand 
+} from "@aws-sdk/client-iam";
+import { client } from "../../client.js";
+import { parse } from "csv-parse";
+import path from "path";
+import fs from "fs";
+
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {
     return policyArn.startsWith("arn:aws:iam::aws:policy/");
@@ -81,6 +91,8 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string)
 
 const convertManagedPolicyToInline = async (roleName: string, policyArn: string): Promise<any> => {
     try {
+        console.log(`Converting AWS managed policy: ${policyArn}`);
+
         const policyVersion = await getPolicyVersion(policyArn);
 
         const policyDefaultVersionId = policyVersion.Policy?.DefaultVersionId;
@@ -111,7 +123,20 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
         const attachedPolicies = response.AttachedPolicies || [];
         const AWSManagedPolicyArns = attachedPolicies.filter(policy => isAWSManagedPolicy(policy.PolicyArn || "")).map(policy => policy.PolicyArn);
 
-        console.log("AWS Managed Policies attached to Role: ", AWSManagedPolicyArns);
+        console.log(`Processing role: ${roleName}`);
+
+        if (AWSManagedPolicyArns.length != 0 ) {
+            console.log(`AWS Managed Policies attached to Role ${roleName}`, AWSManagedPolicyArns);
+            AWSManagedPolicyArns.forEach(policy => (convertManagedPolicyToInline(roleName, policy!)));
+        }
+
+        else {
+            console.log(`No AWS Managed Policies attached to Role ${roleName}`);
+        }
+
+        client.destroy();
+        
+        console.log(`Done processing role: ${roleName} and converting its AWS managed policies into inline policies`);
     }
 
     catch (error) {
@@ -119,5 +144,25 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
     }
 }
 
-//getAWSManagedPoliciesForRole("jabberwocky-test-ecs-task-Role");
-convertManagedPolicyToInline("jabberwocky-test-ecs-task-Role", "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy");
+const processAWSManagedPolicyRemediation = (error: any, csvRecords: any) => {
+    for (let record in csvRecords) {
+      const { RoleName, Arn } = csvRecords[record];
+      getAWSManagedPoliciesForRole(RoleName);
+    }
+}
+
+const getRolesFromIamCsv = (csvPath: string) => {
+    const headers = ["RoleName", "Arn"];
+    const csvFilePath = path.resolve(csvPath);
+    const csvContent = fs.readFileSync(csvFilePath);
+  
+    const csvOptions = {
+      delimiter: ",",
+      columns: headers,
+      from_line: 2
+    };
+  
+    parse(csvContent, csvOptions, processAWSManagedPolicyRemediation);
+  }
+  
+  getRolesFromIamCsv("csvs/iam_roles.csv");
