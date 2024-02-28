@@ -163,6 +163,6 @@ const getRolesFromIamCsv = (csvPath: string) => {
     };
   
     parse(csvContent, csvOptions, processAWSManagedPolicyRemediation);
-  }
+}
   
-  getRolesFromIamCsv("csvs/iam_roles.csv");
+getRolesFromIamCsv("csvs/iam_roles.csv");
