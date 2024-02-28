@@ -91,7 +91,7 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string)
 
 const convertManagedPolicyToInline = async (roleName: string, policyArn: string): Promise<any> => {
     try {
-        console.log(`Attempting to convert AWS managed policy: ${policyArn}`);
+        console.log(`Converting AWS managed policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
 
@@ -104,8 +104,6 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyArn);
         }
-
-        console.log(`Done attempting to convert AWS managed policy: ${policyArn}`);
     }
 
     catch (error) {
@@ -125,7 +123,8 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
         const attachedPolicies = response.AttachedPolicies || [];
         const AWSManagedPolicyArns = attachedPolicies.filter(policy => isAWSManagedPolicy(policy.PolicyArn || "")).map(policy => policy.PolicyArn);
 
-        console.log(`Attempting to process role: ${roleName}`);
+        console.log(`---------------------------------------------------------------------------------`);
+        console.log(`Processing role: ${roleName}`);
 
         if (AWSManagedPolicyArns.length != 0 ) {
             console.log(`AWS Managed Policies attached to Role ${roleName}`, AWSManagedPolicyArns);
@@ -136,7 +135,8 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
         }
 
-        console.log(`Done attempting to process role: ${roleName} and its policies`);
+        console.log(`Done processing role: ${roleName} and its policies`);
+        console.log(`---------------------------------------------------------------------------------`);
     }
 
     catch (error) {
@@ -151,7 +151,7 @@ const processAWSManagedPolicyRemediation = async (error: any, csvRecords: any) =
     }
 }
 
-const getRolesFromIamCsv = (csvPath: string) => {
+const getRolesFromIamCsv = async (csvPath: string) => {
     const headers = ["RoleName", "Arn"];
     const csvFilePath = path.resolve(csvPath);
     const csvContent = fs.readFileSync(csvFilePath);
@@ -162,7 +162,7 @@ const getRolesFromIamCsv = (csvPath: string) => {
       from_line: 2
     };
   
-    parse(csvContent, csvOptions, processAWSManagedPolicyRemediation);
+    await parse(csvContent, csvOptions, processAWSManagedPolicyRemediation);
 }
   
 getRolesFromIamCsv("csvs/iam_roles.csv");
