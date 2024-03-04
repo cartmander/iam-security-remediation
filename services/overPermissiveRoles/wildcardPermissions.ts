@@ -1,10 +1,20 @@
 import { GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, Policy } from "@aws-sdk/client-iam";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
-import { client } from "../../client.js";
+import { client } from "../client.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
-import { BasePolicy, Statement } from "interfaces/Policy.js";
+
+interface BasePolicy {
+    Version: string;
+    Statement: Statement[];
+}
+
+interface Statement {
+    Effect: string;
+    Action: string[];
+    Resource: string;
+}
 
 const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
     try {

@@ -5,11 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "generate": "tsc && node dist/index.js",
     "aws-managed-roles": "tsc && node dist/services/overPermissiveRoles/awsManagedPolicy.js",
-    "wildcard-permissions": "tsc && node dist/services/overPermissiveRoles/wildcardPermissions.js",
-    "file": "tsc && node dist/services/getRoles.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "wildcard-permissions": "tsc && node dist/services/overPermissiveRoles/wildcardPermissions.js"
   },
   "author": "",
   "license": "ISC",

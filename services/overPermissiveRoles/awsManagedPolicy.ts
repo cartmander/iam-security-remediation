@@ -7,7 +7,7 @@ import {
     PutRolePolicyCommand, 
     PutRolePolicyCommandOutput
 } from "@aws-sdk/client-iam";
-import { client } from "../../client.js";
+import { client } from "../client.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
