@@ -29,7 +29,7 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
                 actions.forEach((action, index) => {
                     if (action.includes(":*")) {
                         const service: string = action.split(":")[0];
-                        const servicePermissions: string[] | undefined = generatePermissionsForService(service);
+                        const servicePermissions: any = generatePermissionsForService(service);
     
                         servicePermissions ? actions.splice(index, 1, ...servicePermissions) : console.error(`Unsupported service: ${service}`);
                     }

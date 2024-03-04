@@ -1,4 +1,4 @@
-export const generatePermissionsForService = (service: string): (string[] | undefined) => {
+export const generatePermissionsForService = (service: string): any => {
     switch (service) {
         case "autoscaling":
             return autoscalingPermissions;
