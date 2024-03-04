@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import { BasePolicy, Statement } from "interfaces/Policy.js";
 
-const getPolicyDocument = async (roleName: string, policyName: string): Promise<any> => {
+const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
     try {
         const getRolePolicyCommandInput = {
             RoleName: roleName,
@@ -22,11 +22,11 @@ const getPolicyDocument = async (roleName: string, policyName: string): Promise<
     }
 
     catch (error) {
-        return;
+        throw new Error(`Unable to get Policy Document of this Policy Name: ${policyName}`);
     }
 }
 
-const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy): Promise<any> => {
+const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<BasePolicy> => {
     try {
         const wildcard: string = ":*";
         const actions: string[] = policyDocument.Statement[0].Action;
@@ -43,11 +43,15 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy): 
             }
         }
         
+        else {
+            console.log(`No wildcard permissions found in this Policy Name: ${policyName}`);
+        }
+        
         return policyDocument;
     }
 
     catch (error) {
-
+        throw new Error(`Unable to explicitly define wildcard permissions of this Policy Name: ${policyName}`);
     }    
 }
 
@@ -56,7 +60,7 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
         const policyDocument = await getPolicyDocument(roleName, policyName);
 
         if (policyDocument) {
-            const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument);
+            const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
             console.log(JSON.stringify(convertedDocument));
         }
     }

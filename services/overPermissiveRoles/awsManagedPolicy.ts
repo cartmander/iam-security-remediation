@@ -1,9 +1,11 @@
 import { 
     DetachRolePolicyCommand, 
     GetPolicyCommand, 
+    GetPolicyCommandOutput, 
     GetPolicyVersionCommand, 
     ListAttachedRolePoliciesCommand, 
-    PutRolePolicyCommand 
+    PutRolePolicyCommand, 
+    PutRolePolicyCommandOutput
 } from "@aws-sdk/client-iam";
 import { client } from "../../client.js";
 import { parse } from "csv-parse";
@@ -15,7 +17,7 @@ const isAWSManagedPolicy = (policyArn: string): boolean => {
     return policyArn.startsWith("arn:aws:iam::aws:policy/");
 }
 
-const getPolicyVersion = async (policyArn: string) : Promise<any> => {
+const getPolicyVersion = async (policyArn: string) : Promise<GetPolicyCommandOutput> => {
     try {
         const getPolicyCommandInput = {
             PolicyArn: policyArn
@@ -28,12 +30,11 @@ const getPolicyVersion = async (policyArn: string) : Promise<any> => {
     }
 
     catch (error) {
-        console.error(`Unable to get Policy Version of this Policy ARN: ${policyArn}`);
-        return;
+        throw new Error(`Unable to get Policy Version of this Policy ARN: ${policyArn}`);
     }
 }
 
-const getPolicyDocument = async (policyVersion: string, policyArn: string): Promise<any> => {
+const getPolicyDocument = async (policyVersion: string, policyArn: string): Promise<string> => {
     try {
         const getPolicyVersionCommandInput = {
             PolicyArn: policyArn,
@@ -48,12 +49,11 @@ const getPolicyDocument = async (policyVersion: string, policyArn: string): Prom
     }
 
     catch (error) {
-        console.error(`Unable to get Policy Document of this Policy ARN: ${policyArn}`);
-        return;
+        throw new Error(`Unable to get Policy Document of this Policy ARN: ${policyArn}`);
     }
 }
 
-const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string, policyArn: string): Promise<any> => {
+const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string, policyArn: string): Promise<PutRolePolicyCommandOutput> => {
     try {
         const putRolePolicyCommandInput = {
             PolicyDocument: policyDocument,
@@ -68,8 +68,7 @@ const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleNa
     }
 
     catch (error) {
-        console.error(`Unable to convert Policy Document of this Policy ARN: ${policyArn} into an inline policy`);
-        return;
+        throw new Error(`Unable to convert Policy Document of this Policy ARN: ${policyArn} into an inline policy`);
     }    
 }
 
@@ -85,7 +84,7 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string)
     }
 
     catch (error) {
-        console.error(`Unable to delete the AWS Managed Policy Document of this Policy ARN: ${policyArn}`);
+        throw new Error(`Unable to delete the AWS Managed Policy Document of this Policy ARN: ${policyArn}`);
     }
 }
 
@@ -95,8 +94,8 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
 
         const policyVersion = await getPolicyVersion(policyArn);
 
-        const policyDefaultVersionId = policyVersion.Policy?.DefaultVersionId;
-        const policyName = policyVersion.Policy?.PolicyName;
+        const policyDefaultVersionId = policyVersion.Policy?.DefaultVersionId || "";
+        const policyName = policyVersion.Policy?.PolicyName || "";
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
         const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName, policyArn);
