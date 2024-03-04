@@ -1,3 +1,2 @@
 RoleName,Arn
-jabberwocky-test-ecs-task-Role,arn:aws:iam::539383487878:role/jabberwocky-test-ecs-task-Role
 biffy-test-ecs-task-Role,arn:aws:iam::539383487878:role/biffy-test-ecs-task-Role

@@ -4,6 +4,7 @@ import { client } from "../client.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
+import { getInlinePoliciesByRoleName } from "../../helpers/policies.js";
 
 interface BasePolicy {
     Version: string;
@@ -39,24 +40,23 @@ const getPolicyDocument = async (roleName: string, policyName: string): Promise<
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<BasePolicy> => {
     try {
         const wildcard: string = ":*";
-        const actions: string[] = policyDocument.Statement[0].Action;
-        const wildcardExists: boolean = actions.filter(action => action.includes(wildcard)).length > 0;
-        
-        if (wildcardExists) {
-            for (let i = 0; i < actions.length; i++) {
-                if (actions[i].includes(":*")) {
-                    const service = actions[i].split(":")[0];
-                    const servicePermissions = generatePermissionsForService(service);
 
-                    actions.splice(i, 1, ...servicePermissions);
+        for (let i = 0; i < policyDocument.Statement.length; i++) {
+            const actions: string[] = policyDocument.Statement[i].Action;
+            const wildcardExists: boolean = actions.filter(action => action.includes(wildcard)).length > 0;
+            
+            if (wildcardExists) {
+                for (let j = 0; j < actions.length; j++) {
+                    if (actions[j].includes(":*")) {
+                        const service = actions[j].split(":")[0];
+                        const servicePermissions = generatePermissionsForService(service);
+    
+                        actions.splice(j, 1, ...servicePermissions);
+                    }
                 }
             }
         }
-        
-        else {
-            console.log(`No wildcard permissions found in this Policy Name: ${policyName}`);
-        }
-        
+
         return policyDocument;
     }
 
@@ -71,7 +71,7 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
 
         if (policyDocument) {
             const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
-            console.log(JSON.stringify(convertedDocument));
+            console.log(`${policyName}: ${JSON.stringify(convertedDocument)}`);
         }
     }
 
@@ -80,4 +80,50 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
     }
 }
 
-convertWildcardPermissionsToSpecificActions("biffy-test-ecs-task-Role", "test_s3_all");
+const processWildcardPermissionsRemediation = async (roleName: string): Promise<void> => {
+    try {
+        const inlinePolicies = await getInlinePoliciesByRoleName(roleName);
+
+        console.log(`---------------------------------------------------------------------------------`);
+        console.log(`Processing role: ${roleName}`);
+
+        if (inlinePolicies.length != 0 ) {
+            console.log(`Inline policies attached to Role ${roleName}`, inlinePolicies);
+            inlinePolicies.forEach((policyName: string) => (convertWildcardPermissionsToSpecificActions(roleName, policyName)));
+        }
+
+        else {
+            console.log(`No inline policies attached to Role ${roleName}`);
+        }
+
+        console.log(`Done processing role: ${roleName} and its policies`);
+        console.log(`---------------------------------------------------------------------------------`);
+    }
+
+    catch (error) {
+        console.error(`Error getting inline policies for role: ${roleName}`, error);
+    }
+}
+
+const loopCsvRecords = async (error: any, csvRecords: any) => {
+    for (let record in csvRecords) {
+      const { RoleName, Arn } = csvRecords[record];
+      await processWildcardPermissionsRemediation(RoleName);
+    }
+}
+
+const getRolesFromIamCsv = async (csvPath: string) => {
+    const headers = ["RoleName", "Arn"];
+    const csvFilePath = path.resolve(csvPath);
+    const csvContent = fs.readFileSync(csvFilePath);
+  
+    const csvOptions = {
+      delimiter: ",",
+      columns: headers,
+      from_line: 2
+    };
+  
+    await parse(csvContent, csvOptions, loopCsvRecords);
+}
+  
+getRolesFromIamCsv("csvs/iam_roles.csv");

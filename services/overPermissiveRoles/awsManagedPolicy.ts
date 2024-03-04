@@ -2,8 +2,7 @@ import {
     DetachRolePolicyCommand, 
     GetPolicyCommand, 
     GetPolicyCommandOutput, 
-    GetPolicyVersionCommand, 
-    ListAttachedRolePoliciesCommand, 
+    GetPolicyVersionCommand,
     PutRolePolicyCommand, 
     PutRolePolicyCommandOutput
 } from "@aws-sdk/client-iam";
@@ -11,11 +10,7 @@ import { client } from "../client.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
-
-
-const isAWSManagedPolicy = (policyArn: string): boolean => {
-    return policyArn.startsWith("arn:aws:iam::aws:policy/");
-}
+import { getAWSManagedPoliciesByRoleName } from "../../helpers/policies.js";
 
 const getPolicyVersion = async (policyArn: string) : Promise<GetPolicyCommandOutput> => {
     try {
@@ -110,24 +105,16 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
     }
 }
 
-const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => {
+const processAWSManagedPolicyRemediation = async (roleName: string): Promise<void> => {
     try {
-        const listAttachedRolePoliciesCommandInput = {
-            RoleName: roleName
-        };
-
-        const command = new ListAttachedRolePoliciesCommand(listAttachedRolePoliciesCommandInput);
-        const response = await client.send(command);
-
-        const attachedPolicies = response.AttachedPolicies || [];
-        const AWSManagedPolicyArns = attachedPolicies.filter(policy => isAWSManagedPolicy(policy.PolicyArn || "")).map(policy => policy.PolicyArn);
+        const awsManagedPolicies = await getAWSManagedPoliciesByRoleName(roleName);
 
         console.log(`---------------------------------------------------------------------------------`);
         console.log(`Processing role: ${roleName}`);
 
-        if (AWSManagedPolicyArns.length != 0 ) {
-            console.log(`AWS Managed Policies attached to Role ${roleName}`, AWSManagedPolicyArns);
-            AWSManagedPolicyArns.forEach((policy) => (convertManagedPolicyToInline(roleName, policy!)));
+        if (awsManagedPolicies.length != 0 ) {
+            console.log(`AWS Managed Policies attached to Role ${roleName}`, awsManagedPolicies);
+            awsManagedPolicies.forEach((policy) => (convertManagedPolicyToInline(roleName, policy!)));
         }
 
         else {
@@ -139,14 +126,14 @@ const getAWSManagedPoliciesForRole = async (roleName: string): Promise<void> => 
     }
 
     catch (error) {
-        console.error("Error getting AWS managed policies for role: ", error);
+        console.error(`Error getting inline policies for role: ${roleName}`, error);
     }
 }
 
-const processAWSManagedPolicyRemediation = async (error: any, csvRecords: any) => {
+const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let record in csvRecords) {
       const { RoleName, Arn } = csvRecords[record];
-      await getAWSManagedPoliciesForRole(RoleName);
+      await processAWSManagedPolicyRemediation(RoleName);
     }
 }
 
@@ -161,7 +148,7 @@ const getRolesFromIamCsv = async (csvPath: string) => {
       from_line: 2
     };
   
-    await parse(csvContent, csvOptions, processAWSManagedPolicyRemediation);
+    await parse(csvContent, csvOptions, loopCsvRecords);
 }
   
 getRolesFromIamCsv("csvs/iam_roles.csv");
