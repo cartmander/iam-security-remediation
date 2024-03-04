@@ -89,9 +89,7 @@ const processWildcardPermissionsRemediation = async (roleName: string): Promise<
 
         if (inlinePolicies.length != 0 ) {
             console.log(`Inline policies attached to Role ${roleName}`, inlinePolicies);
-            inlinePolicies.forEach((policyName: string) => {
-                if (policyName == "test_s3_all") { (convertWildcardPermissionsToSpecificActions(roleName, policyName)) }
-            });
+            inlinePolicies.forEach((policyName: string) =>  (convertWildcardPermissionsToSpecificActions(roleName, policyName)));
         }
 
         else {
