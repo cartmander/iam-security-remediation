@@ -1,4 +1,4 @@
-export const generatePermissionsForService = (service: string): string[] => {
+export const generatePermissionsForService = (service: string): (string[] | undefined) => {
     switch (service) {
         case "autoscaling":
             return autoscalingPermissions;
@@ -63,8 +63,7 @@ export const generatePermissionsForService = (service: string): string[] => {
         case "ssm":
             return ssmPermissions;
         default:
-            throw new Error(`Unsupported service yet: ${service}`);
-            
+            return;
     }
 }
 

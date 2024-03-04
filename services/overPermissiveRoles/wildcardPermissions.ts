@@ -39,24 +39,24 @@ const getPolicyDocument = async (roleName: string, policyName: string): Promise<
 
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<BasePolicy> => {
     try {
-        const wildcard: string = ":*";
+        const statements: Statement[] = policyDocument.Statement;
 
-        for (let i = 0; i < policyDocument.Statement.length; i++) {
-            const actions: string[] = policyDocument.Statement[i].Action;
-            const wildcardExists: boolean = actions.filter(action => action.includes(wildcard)).length > 0;
-            
+        statements.forEach((statement) => {
+            const actions: string[] = statement.Action;
+            const wildcardExists: boolean = actions.filter(action => action.includes(":*")).length > 0;
+
             if (wildcardExists) {
-                for (let j = 0; j < actions.length; j++) {
-                    if (actions[j].includes(":*")) {
-                        const service = actions[j].split(":")[0];
-                        const servicePermissions = generatePermissionsForService(service);
+                actions.forEach((action, index) => {
+                    if (action.includes(":*")) {
+                        const service: string = action.split(":")[0];
+                        const servicePermissions: string[] | undefined = generatePermissionsForService(service);
     
-                        actions.splice(j, 1, ...servicePermissions);
+                        servicePermissions ? actions.splice(index, 1, ...servicePermissions) : console.error(`Unsupported service: ${service}`);
                     }
-                }
+                });
             }
-        }
-
+        });
+        
         return policyDocument;
     }
 
@@ -89,7 +89,9 @@ const processWildcardPermissionsRemediation = async (roleName: string): Promise<
 
         if (inlinePolicies.length != 0 ) {
             console.log(`Inline policies attached to Role ${roleName}`, inlinePolicies);
-            inlinePolicies.forEach((policyName: string) => (convertWildcardPermissionsToSpecificActions(roleName, policyName)));
+            inlinePolicies.forEach((policyName: string) => {
+                if (policyName == "test_s3_all") { (convertWildcardPermissionsToSpecificActions(roleName, policyName)) }
+            });
         }
 
         else {
