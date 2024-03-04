@@ -20,4 +20,4 @@ jobs:
       repo: iam-role-access-advisor
       branchToCheckout: main
       runner: common-8gb-or-smaller
-      aframeFilePath: ./infra/aframe.prod.yaml
+      aframeFilePath: ./infrastructure/aframe.prod.yaml
