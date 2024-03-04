@@ -17,26 +17,6 @@ interface Statement {
     Resource: string;
 }
 
-const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
-    try {
-        const getRolePolicyCommandInput = {
-            RoleName: roleName,
-            PolicyName: policyName
-        }
-
-        const command = new GetRolePolicyCommand(getRolePolicyCommandInput);
-        const response = await client.send(command);
-
-        const policyDocument = JSON.parse(decodeURIComponent(response.PolicyDocument!));
-
-        return policyDocument;
-    }
-
-    catch (error) {
-        throw new Error(`Unable to get Policy Document of this Policy Name: ${policyName}`);
-    }
-}
-
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<BasePolicy> => {
     try {
         const statements: Statement[] = policyDocument.Statement;
@@ -65,13 +45,33 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
     }    
 }
 
+const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
+    try {
+        const getRolePolicyCommandInput = {
+            RoleName: roleName,
+            PolicyName: policyName
+        }
+
+        const command = new GetRolePolicyCommand(getRolePolicyCommandInput);
+        const response = await client.send(command);
+
+        const policyDocument = JSON.parse(decodeURIComponent(response.PolicyDocument!));
+
+        return policyDocument;
+    }
+
+    catch (error) {
+        throw new Error(`Unable to get Policy Document of this Policy Name: ${policyName}`);
+    }
+}
+
 const convertWildcardPermissionsToSpecificActions = async (roleName: string, policyName: string): Promise<any> => {
     try {
         const policyDocument = await getPolicyDocument(roleName, policyName);
 
         if (policyDocument) {
             const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
-            console.log(`${policyName}: ${JSON.stringify(convertedDocument)}`);
+            console.log(`${policyName} =========== ${JSON.stringify(convertedDocument)}`);
         }
     }
 
