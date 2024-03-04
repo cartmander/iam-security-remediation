@@ -2,8 +2,66 @@ export const generatePermissionsForService = (service: string): string[] => {
     switch (service) {
         case "autoscaling":
             return autoscalingPermissions;
+        case "cloudformation":
+            return cloudFormationPermissions;
+        case "cloudwatch":
+            return cloudWatchPermissions;
+        case "codedeploy":
+            return codeDeployPermissions;
+        case "codestar-notifications":
+            return codeStarNotificationsPermissions;
+        case "connect":
+            return connectPermissions;
+        case "dax":
+            return daxPermissions;
+        case "dynamodb":
+            return dynamoDBPermissions;
+        case "ec2":
+            return ec2Permissions;
+        case "ecr":
+            return ecrPermissions;
+        case "ecs":
+            return ecsPermissions;
+        case "elasticbeanstalk":
+            return elasticBeanstalkPermissions;
+        case "elasticache":
+            return elastiCachePermissions;
+        case "elasticloadbalancing":
+            return elasticLoadBalancingPermissions;
+        case "es":
+            return elasticSearchServicePermissions;
+        case "events":
+            return eventsPermissions;
+        case "firehose":
+            return firehosePermissions;
+        case "glue":
+            return gluePermissions;
+        case "kms":
+            return kmsPermissions;
+        case "lambda":
+            return lambdaPermissions;
+        case "logs":
+            return logsPermissions;
+        case "pi":
+            return piPermissions;
+        case "rds":
+            return rdsPermissions;
+        case "redshift":
+            return redshiftPermissions;
+        case "redshift-serverless":
+            return redshiftServerlessPermissions;
         case "s3":
             return s3Permissions;
+        case "s3-object-lambda":
+            return s3ObjectLambdaPermissions;
+        case "secretsmanager":
+            return secretsManagerPermissions;
+        case "sns":
+            return snsPermissions;
+        case "sqs":
+            return sqsPermissions;
+        case "ssm":
+            return ssmPermissions;
         default:
             throw new Error(`Unsupported service yet: ${service}`);
             
@@ -345,7 +403,7 @@ const elasticBeanstalkPermissions: string[] = [
     "elasticbeanstalk:ValidateConfigurationSettings"
 ];
 
-const elasticachePermissions: string[] = [
+const elastiCachePermissions: string[] = [
     "elasticache:AddTagsToResource",
     "elasticache:AuthorizeCacheSecurityGroupIngress",
     "elasticache:BatchApplyUpdateAction",
@@ -379,7 +437,7 @@ const elasticachePermissions: string[] = [
     "elasticache:TestMigration"
 ];
 
-const elasticLoadBalancing: string[] = [
+const elasticLoadBalancingPermissions: string[] = [
     "elasticloadbalancing:AddTags",
     "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
     "elasticloadbalancing:AttachLoadBalancerToSubnets",
