@@ -112,7 +112,7 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
     }
 }
 
-const getRolesFromIamCsv = async (csvPath: string) => {
+const main = async (csvPath: string) => {
     const headers = ["RoleName", "Arn"];
     const csvFilePath = path.resolve(csvPath);
     const csvContent = fs.readFileSync(csvFilePath);
@@ -126,4 +126,4 @@ const getRolesFromIamCsv = async (csvPath: string) => {
     await parse(csvContent, csvOptions, loopCsvRecords);
 }
   
-getRolesFromIamCsv("csvs/iam_roles.csv");
+main("csvs/iam_roles.csv");
