@@ -17,46 +17,31 @@ interface Statement {
     Resource: string;
 }
 
-const transformActions = (action: string) => {
-    if (action.includes(":*")) {
-        const service: string = action.split(":")[0];
-        const servicePermissions: any = generatePermissionsForService(service);
-
-        if (servicePermissions) {
-            action.concat(servicePermissions);
-        }
-        
-    }
-
-    return action;
-}
-
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<any> => {
     try {
         const statements: Statement[] = policyDocument.Statement;
 
-        for (let i = 0; i < statements.length; i++) {
-            let actions: string[] = statements[i].Action;
-            let newActions: string[] = [];
+        statements.forEach(statement => {
+            let actions: string[] = statement.Action;
+            let explicitlyDefinedActions: string[] = [];
             const wildcardExists: boolean = actions.some(action => action.includes(":*"));
 
             if (wildcardExists) {
-                for (let j = 0; j < actions.length; j++) {
-                    if (actions[j].includes(":*")) {
-                        const service: string = actions[j].split(":")[0];
+                actions.forEach(action => {
+                    if (action.includes(":*")) {
+                        const service: string = action.split(":")[0];
                         const servicePermissions: any = generatePermissionsForService(service);
-        
-                        servicePermissions ? newActions = newActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+                        servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
                     }
 
                     else {
-                        newActions = newActions.concat(actions[j]);
+                        explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
                     }
-                }
-                
-                statements[i].Action = newActions;
+                });
+
+                statement.Action = explicitlyDefinedActions;
             }
-        }
+        });
         
         return policyDocument;
     }
