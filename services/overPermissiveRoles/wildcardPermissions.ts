@@ -1,4 +1,4 @@
-import { GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, Policy } from "@aws-sdk/client-iam";
+import { GetPolicyCommand, GetRolePolicyCommand } from "@aws-sdk/client-iam";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
 import { client } from "../client.js";
 import { parse } from "csv-parse";
@@ -13,7 +13,7 @@ interface BasePolicy {
 
 interface Statement {
     Effect: string;
-    Action: string[];
+    Action: string[] | string;
     Resource: string;
 }
 
@@ -22,22 +22,41 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
         const statements: Statement[] = policyDocument.Statement;
 
         statements.forEach(statement => {
-            let actions: string[] = statement.Action;
+            let actions: string[] | string = statement.Action;
             let explicitlyDefinedActions: string[] = [];
-            const wildcardExists: boolean = actions.some(action => action.includes(":*"));
 
-            if (wildcardExists) {
-                actions.forEach(action => {
-                    if (action.includes(":*")) {
-                        const service: string = action.split(":")[0];
-                        const servicePermissions: any = generatePermissionsForService(service);
-                        servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
-                    }
+            if (Array.isArray(actions)) {
+                const wildcardExists: boolean = actions.some(action => action.includes(":*"));
+    
+                if (wildcardExists) {
+                    actions.forEach(action => {
+                        if (action.includes(":*")) {
+                            const service: string = action.split(":")[0];
+                            const servicePermissions: any = generatePermissionsForService(service);
+                            servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+                        }
+    
+                        else {
+                            explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
+                        }
+                    });
+    
+                    statement.Action = explicitlyDefinedActions;
+                }
+            }
 
-                    else {
-                        explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
-                    }
-                });
+            else {
+                const wildcardExists: boolean = actions.includes(":*");
+
+                if (wildcardExists) {
+                    const service: string = actions.split(":")[0];
+                    const servicePermissions: any = generatePermissionsForService(service);
+                    servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+                }
+
+                else {
+                    explicitlyDefinedActions = explicitlyDefinedActions.concat(actions);
+                }
 
                 statement.Action = explicitlyDefinedActions;
             }
@@ -77,7 +96,12 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
 
         if (policyDocument) {
             const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
-            console.log(`${policyName} =========== ${JSON.stringify(convertedDocument)}`);
+            const stringifyDocument = JSON.stringify(convertedDocument);
+            const documentLengthInBytes = new TextEncoder().encode(stringifyDocument).length;
+            console.log(`---------------------------------------------------------------------------------`);
+            console.log(`${policyName}: ${documentLengthInBytes}`);
+            console.log(stringifyDocument);
+            console.log(`---------------------------------------------------------------------------------`);
         }
     }
 
