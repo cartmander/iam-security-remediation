@@ -17,32 +17,53 @@ interface Statement {
     Resource: string;
 }
 
-const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<BasePolicy> => {
+const transformActions = (action: string) => {
+    if (action.includes(":*")) {
+        const service: string = action.split(":")[0];
+        const servicePermissions: any = generatePermissionsForService(service);
+
+        if (servicePermissions) {
+            action.concat(servicePermissions);
+        }
+        
+    }
+
+    return action;
+}
+
+const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<any> => {
     try {
         const statements: Statement[] = policyDocument.Statement;
 
-        statements.forEach((statement) => {
-            const actions: string[] = statement.Action;
-            const wildcardExists: boolean = actions.filter(action => action.includes(":*")).length > 0;
+        for (let i = 0; i < statements.length; i++) {
+            let actions: string[] = statements[i].Action;
+            let newActions: string[] = [];
+            const wildcardExists: boolean = actions.some(action => action.includes(":*"));
 
             if (wildcardExists) {
-                actions.forEach((action, index) => {
-                    if (action.includes(":*")) {
-                        const service: string = action.split(":")[0];
+                for (let j = 0; j < actions.length; j++) {
+                    if (actions[j].includes(":*")) {
+                        const service: string = actions[j].split(":")[0];
                         const servicePermissions: any = generatePermissionsForService(service);
-    
-                        servicePermissions ? actions.splice(index, 1, ...servicePermissions) : console.error(`Unsupported service: ${service}`);
+        
+                        servicePermissions ? newActions = newActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
                     }
-                });
+
+                    else {
+                        newActions = newActions.concat(actions[j]);
+                    }
+                }
+                
+                statements[i].Action = newActions;
             }
-        });
+        }
         
         return policyDocument;
     }
 
     catch (error) {
         throw new Error(`Unable to explicitly define wildcard permissions of this Policy Name: ${policyName}`);
-    }    
+    }  
 }
 
 const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
