@@ -17,6 +17,8 @@ interface Statement {
     Resource: string;
 }
 
+// const updatePolicyDocument = async 
+
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<any> => {
     try {
         const statements: Statement[] = policyDocument.Statement;
@@ -97,11 +99,13 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
         if (policyDocument) {
             const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
             const stringifyDocument = JSON.stringify(convertedDocument);
-            const documentLengthInBytes = new TextEncoder().encode(stringifyDocument).length;
+            const documentLength = stringifyDocument.length;
+
             console.log(`---------------------------------------------------------------------------------`);
-            console.log(`${policyName}: ${documentLengthInBytes}`);
-            console.log(stringifyDocument);
+            console.log(`${policyName}:\n${stringifyDocument}`);
+            console.log(documentLength);
             console.log(`---------------------------------------------------------------------------------`);
+
         }
     }
 
@@ -137,13 +141,13 @@ const processWildcardPermissionsRemediation = async (roleName: string): Promise<
 
 const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let record in csvRecords) {
-      const { RoleName, Arn } = csvRecords[record];
+      const { RoleName } = csvRecords[record];
       await processWildcardPermissionsRemediation(RoleName);
     }
 }
 
 const main = async (csvPath: string) => {
-    const headers = ["RoleName", "Arn"];
+    const headers = ["RoleName"];
     const csvFilePath = path.resolve(csvPath);
     const csvContent = fs.readFileSync(csvFilePath);
   

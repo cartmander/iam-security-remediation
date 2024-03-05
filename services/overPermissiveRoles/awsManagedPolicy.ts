@@ -132,13 +132,13 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
 const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let record in csvRecords) {
-      const { RoleName, Arn } = csvRecords[record];
+      const { RoleName } = csvRecords[record];
       await processAWSManagedPolicyRemediation(RoleName);
     }
 }
 
 const main = async (csvPath: string) => {
-    const headers = ["RoleName", "Arn"];
+    const headers = ["RoleName"];
     const csvFilePath = path.resolve(csvPath);
     const csvContent = fs.readFileSync(csvFilePath);
   
