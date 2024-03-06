@@ -48,7 +48,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
             console.log(`\nSummary for Role: ${roleName}`);
             console.log(`\tSuccessfully processed AWS Managed Policies [${convertedPolicies.length} out of ${awsManagedPoliciesLength}]: `, convertedPolicies);
-            console.log(`\tUnsuccessfully processed AWS Managed Policies [${notConvertedPolicies.length} out of ${awsManagedPoliciesLength}]: `, notConvertedPolicies);
+            console.log(`\tFailed to process AWS Managed Policies [${notConvertedPolicies.length} out of ${awsManagedPoliciesLength}]: `, notConvertedPolicies);
         }
 
         else {
