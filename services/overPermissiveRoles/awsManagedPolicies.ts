@@ -45,7 +45,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
                 let processedPolicies = await convertManagedPolicyToInline(roleName, policy, index + 1, awsManagedPoliciesLength);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
-                buildRemediationCsv(roleName, policy, processedPolicies, "awsManagedPolicy.csv");
+                buildRemediationCsv(roleName, policy, processedPolicies, "awsManagedPolicies.csv");
             }
 
             console.log(`\nSummary for Role: ${roleName}`);
@@ -55,7 +55,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolicy.csv");
+            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolices.csv");
         }
     }
 
