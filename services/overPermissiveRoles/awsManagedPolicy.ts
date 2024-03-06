@@ -1,4 +1,5 @@
 import { getAWSManagedPoliciesByRoleName, getPolicyVersionDocument, getPolicyVersion, createPolicyDocumentInRoleAsInline, deleteAWSManagedPolicyInRole } from "../../helpers/policies.js";
+import { buildRemediationCsv } from "../../helpers/misc.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
@@ -45,7 +46,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
                 
-                buildAWSManagedRemediationCsv(roleName, policy, processedPolicies,);
+                buildRemediationCsv(roleName, policy, processedPolicies, "awsManagedPolicy.csv");
             }
 
             console.log(`\nSummary for Role: ${roleName}`);
@@ -55,7 +56,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            buildAWSManagedRemediationCsv(roleName, "<No AWS Managed Policies attached>", false);
+            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolicy.csv");
         }
     }
 
@@ -63,27 +64,6 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
         console.error(`Error getting inline policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
     }
 }
-
-const buildAWSManagedRemediationCsv = (roleName: string, policy: string, status: boolean) => {
-    const roleDirectory = `results/overPermissiveRoles`;
-    const roleCsv = `${roleDirectory}/awsManagedPolicy.csv`;
-    const url = `https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/roles/details/${roleName}?section=permissions`;
-  
-    try {
-        if (!fs.existsSync(roleCsv)) {
-            fs.mkdirSync(roleDirectory,  { recursive: true });
-            fs.writeFileSync(roleCsv, "RoleName,Policy,WasProcessed,URL\n");
-        }
-        else {
-            fs.appendFileSync(roleCsv, `${roleName},${policy},${status},${url}\n`);
-        }
-    }
-  
-    catch (error) {
-      console.log(`Error building IAM csv for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
-      return;
-    }
-  }
 
 const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let index = 0; index < csvRecords.length; index++) {
