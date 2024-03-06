@@ -88,7 +88,7 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
         let convertedPoliciesList: string[] = [];
         let notConvertedPoliciesList: string[] = [];
 
-        console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting AWS managed policy: ${policyArn}`);
+        console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting AWS Managed Policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
 
@@ -127,8 +127,9 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
         if (awsManagedPoliciesLength != 0 ) {
             console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
-            awsManagedPolicies.forEach(async (policy, index) => {
-                const processedPolicies = await convertManagedPolicyToInline(roleName, policy!, index+1, awsManagedPoliciesLength);
+
+            for (let i = 0; i < awsManagedPolicies.length; i ++) {
+                const processedPolicies = await convertManagedPolicyToInline(roleName, awsManagedPolicies[i], i+1, awsManagedPoliciesLength);
                 const convertedPolicies = processedPolicies.ConvertedPolicies;
                 const notConvertedPolicies = processedPolicies.NotConvertedPolicies;
                 const totalConvertedPolicies = convertedPolicies.length;
@@ -137,7 +138,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
                 console.log(`Summary for Role: ${roleName}`);
                 console.log(`\tSuccessfully processed AWS Managed Policies [${totalConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(convertedPolicies)}`);
                 console.log(`\tUnsuccessfully processed AWS Managed Policies [${totalNotConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(notConvertedPolicies)}`);
-            });
+            }
         }
 
         else {
@@ -153,10 +154,12 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let index = 0; index < csvRecords.length; index++) {
         const { RoleName } = csvRecords[index];
-        console.log(`---------------------------------------------------------------------------------`);
+        
         console.log(`[${index+1}] Processing role: ${RoleName}`);
-
+        
         await processAWSManagedPolicyRemediation(RoleName);
+        
+        console.log(`\nDone processing role: ${RoleName}\n`);
     }
 }
 
