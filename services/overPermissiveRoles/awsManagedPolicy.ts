@@ -84,10 +84,6 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyName: string
 
 const convertManagedPolicyToInline = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
     try {
-
-        let convertedPoliciesList: string[] = [];
-        let notConvertedPoliciesList: string[] = [];
-
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting AWS Managed Policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
@@ -100,18 +96,10 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
 
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
-            convertedPoliciesList = convertedPoliciesList.concat(policyName);
+            return true;
         }
 
-        else {
-            
-            notConvertedPoliciesList = notConvertedPoliciesList.concat(policyName);
-        }
-
-        return {
-            ConvertedPolicies: convertedPoliciesList,
-            NotConvertedPolicies: notConvertedPoliciesList
-        }
+        return false;
     }
 
     catch (error) {
@@ -121,6 +109,9 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
 
 const processAWSManagedPolicyRemediation = async (roleName: string): Promise<void> => {
     try {
+        let processedPolicies;
+        let convertedPolicies: string[] = [];
+        let notConvertedPolicies: string[] = [];
         const awsManagedPolicies = await getAWSManagedPoliciesByRoleName(roleName);
         const awsManagedPoliciesLength = awsManagedPolicies.length;
 
@@ -128,17 +119,23 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
             console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
 
-            for (let i = 0; i < awsManagedPolicies.length; i ++) {
-                const processedPolicies = await convertManagedPolicyToInline(roleName, awsManagedPolicies[i], i+1, awsManagedPoliciesLength);
-                const convertedPolicies = processedPolicies.ConvertedPolicies;
-                const notConvertedPolicies = processedPolicies.NotConvertedPolicies;
-                const totalConvertedPolicies = convertedPolicies.length;
-                const totalNotConvertedPolicies = notConvertedPolicies.length;
-
-                console.log(`Summary for Role: ${roleName}`);
-                console.log(`\tSuccessfully processed AWS Managed Policies [${totalConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(convertedPolicies)}`);
-                console.log(`\tUnsuccessfully processed AWS Managed Policies [${totalNotConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(notConvertedPolicies)}`);
+            for (let index = 0; index < awsManagedPolicies.length; index++) {
+                const policy = awsManagedPolicies[index];
+                processedPolicies = await convertManagedPolicyToInline(roleName, policy, index+1, awsManagedPoliciesLength);
+                if (processedPolicies) {
+                    convertedPolicies = convertedPolicies.concat(policy);
+                }
+                else {
+                    notConvertedPolicies = notConvertedPolicies.concat(policy);
+                }
             }
+            
+            const totalConvertedPolicies = convertedPolicies.length;
+            const totalNotConvertedPolicies = notConvertedPolicies.length;
+
+            console.log(`\nSummary for Role: ${roleName}`);
+            console.log(`\tSuccessfully processed AWS Managed Policies [${totalConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(convertedPolicies)}`);
+            console.log(`\tUnsuccessfully processed AWS Managed Policies [${totalNotConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(notConvertedPolicies)}`);
         }
 
         else {
