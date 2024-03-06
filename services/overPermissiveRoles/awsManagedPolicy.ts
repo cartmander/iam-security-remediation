@@ -11,7 +11,7 @@ import path from "path";
 import fs from "fs";
 import { getAWSManagedPoliciesByRoleName } from "../../helpers/policies.js";
 
-const getPolicyVersion = async (policyArn: string) : Promise<GetPolicyCommandOutput> => {
+const getPolicyVersion = async (policyArn: string) : Promise<any> => {
     try {
         const getPolicyCommandInput = {
             PolicyArn: policyArn
@@ -24,11 +24,11 @@ const getPolicyVersion = async (policyArn: string) : Promise<GetPolicyCommandOut
     }
 
     catch (error) {
-        throw new Error(`Unable to get Policy Version of this Policy ARN: ${policyArn}`);
+        console.error(`Unable to get Policy Version of this Policy ARN: ${policyArn}`);
     }
 }
 
-const getPolicyDocument = async (policyVersion: string, policyArn: string): Promise<string> => {
+const getPolicyDocument = async (policyVersion: string, policyArn: string): Promise<any> => {
     try {
         const getPolicyVersionCommandInput = {
             PolicyArn: policyArn,
@@ -43,7 +43,7 @@ const getPolicyDocument = async (policyVersion: string, policyArn: string): Prom
     }
 
     catch (error) {
-        throw new Error(`Unable to get Policy Document of this Policy ARN: ${policyArn}`);
+        console.error(`Unable to get Policy Document of this Policy ARN: ${policyArn}`);
     }
 }
 
@@ -152,11 +152,11 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
 const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let index = 0; index < csvRecords.length; index++) {
-      const { RoleName } = csvRecords[index];
-      console.log(`---------------------------------------------------------------------------------`);
-      console.log(`[${index+1}] Processing role: ${RoleName}`);
+        const { RoleName } = csvRecords[index];
+        console.log(`---------------------------------------------------------------------------------`);
+        console.log(`[${index+1}] Processing role: ${RoleName}`);
 
-      await processAWSManagedPolicyRemediation(RoleName);
+        await processAWSManagedPolicyRemediation(RoleName);
     }
 }
 

@@ -1,12 +1,3 @@
 RoleName
-ubif-use1-stg-lambda-reds-LambdaEncryptionLambdaSe-174QQBHN406XP
-ubif-use1-prd-lambda-reds-LambdaEncryptionLambdaSe-I42JIVP3QEYW
-AWSCodePipelineServiceRole-us-east-1-stage-biffy
-acdk-AWSCodeBuildRole-us-east-1-sre-stage-jabberwocky-blue
 acdk-ConfigRoleDDog
 acdk-AWS-UBIF-ChatOps-Read-Only
-acdk-Biffy-stage-Ecs-Task-Role
-acdk-uBreakiFix-IAM-WO94N632XV46-WorkerIAMRole-1XISQ6B6V83ED
-acdk-Johnny-5
-acdk-AWS-UBIF-ChatOps
-acdk-uBreakiFix-IAM-WO94N632XV46-PortalIAMRole-1HQH6U9I2NPU9
