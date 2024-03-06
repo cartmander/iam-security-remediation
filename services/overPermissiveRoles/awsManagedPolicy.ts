@@ -98,7 +98,7 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
         console.log("------------------------------------------------------------------------------------------");
     }
 }
-// TODO: Add another summary for all roles with links or put it on a csv
+
 const main = async (csvPath: string) => {
     const headers = ["RoleName"];
     const csvFilePath = path.resolve(csvPath);
