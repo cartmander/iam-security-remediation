@@ -3,6 +3,7 @@ import {
     GetPolicyCommand, 
     GetPolicyCommandOutput, 
     GetPolicyVersionCommand,
+    LimitExceededException,
     PutRolePolicyCommand, 
     PutRolePolicyCommandOutput
 } from "@aws-sdk/client-iam";
@@ -48,7 +49,7 @@ const getPolicyDocument = async (policyVersion: string, policyArn: string): Prom
     }
 }
 
-const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string, policyArn: string): Promise<PutRolePolicyCommandOutput> => {
+const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleName: string, policyName: string): Promise<any> => {
     try {
         const putRolePolicyCommandInput = {
             PolicyDocument: policyDocument,
@@ -63,11 +64,11 @@ const createPolicyDocumentInRoleAsInline = async (policyDocument: string, roleNa
     }
 
     catch (error) {
-        throw new Error(`Unable to convert Policy Document of this Policy ARN: ${policyArn} into an inline policy`);
+        console.error(`Unable to create policy ${policyName} as inline: ${(error as Error).name} - ${(error as Error).message}`);
     }    
 }
 
-const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string) => {
+const deleteAWSManagedPolicyInRole = async (roleName: string, policyName: string, policyArn: string) => {
     try {
         const deleteRolePolicyCommandinput = {
             RoleName: roleName,
@@ -79,13 +80,17 @@ const deleteAWSManagedPolicyInRole = async (roleName: string, policyArn: string)
     }
 
     catch (error) {
-        throw new Error(`Unable to delete the AWS Managed Policy Document of this Policy ARN: ${policyArn}`);
+        console.error(`Unable to delete policy ${policyName} as AWS managed: ${(error as Error).name} - ${(error as Error).message}`);
     }
 }
 
-const convertManagedPolicyToInline = async (roleName: string, policyArn: string): Promise<any> => {
+const convertManagedPolicyToInline = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
     try {
-        console.log(`Converting AWS managed policy: ${policyArn}`);
+
+        let convertedPoliciesList: string[] = [];
+        let notConvertedPoliciesList: string[] = [];
+
+        console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting AWS managed policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
 
@@ -93,10 +98,21 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
         const policyName = policyVersion.Policy?.PolicyName || "";
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
-        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName, policyArn);
+        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
 
         if (convertedPolicyDocument) {
-            await deleteAWSManagedPolicyInRole(roleName, policyArn);
+            await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
+            convertedPoliciesList = convertedPoliciesList.concat(policyName);
+        }
+
+        else {
+            
+            notConvertedPoliciesList = notConvertedPoliciesList.concat(policyName);
+        }
+
+        return {
+            ConvertedPolicies: convertedPoliciesList,
+            NotConvertedPolicies: notConvertedPoliciesList
         }
     }
 
@@ -108,21 +124,30 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string)
 const processAWSManagedPolicyRemediation = async (roleName: string): Promise<void> => {
     try {
         const awsManagedPolicies = await getAWSManagedPoliciesByRoleName(roleName);
+        const awsManagedPoliciesLength = awsManagedPolicies.length;
 
-        console.log(`---------------------------------------------------------------------------------`);
-        console.log(`Processing role: ${roleName}`);
+        if (awsManagedPoliciesLength != 0 ) {
+            console.log(`AWS Managed Policies:`, awsManagedPolicies);
+            console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
+            awsManagedPolicies.forEach(async (policy, index) => {
+                const processedPolicies = await convertManagedPolicyToInline(roleName, policy!, index+1, awsManagedPoliciesLength);
+                const convertedPolicies = processedPolicies.ConvertedPolicies;
+                const notConvertedPolicies = processedPolicies.NotConvertedPolicies;
+                const totalConvertedPolicies = convertedPolicies.length;
+                const totalNotConvertedPolicies = notConvertedPolicies.length;
 
-        if (awsManagedPolicies.length != 0 ) {
-            console.log(`AWS Managed Policies attached to Role ${roleName}`, awsManagedPolicies);
-            awsManagedPolicies.forEach((policy) => (convertManagedPolicyToInline(roleName, policy!)));
+                console.log(`Summary for Role: ${roleName}`);
+                console.log(`\tSuccessfully processed AWS Managed Policies [${totalConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(convertedPolicies)}`);
+                console.log(`\tUnsuccessfully processed AWS Managed Policies [${totalNotConvertedPolicies} out of ${awsManagedPoliciesLength}]: ${JSON.stringify(notConvertedPolicies)}`);
+            });
         }
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
         }
 
-        console.log(`Done processing role: ${roleName} and its policies`);
-        console.log(`---------------------------------------------------------------------------------`);
+        //console.log(`Done processing role: ${roleName} and its policies`);
+        //console.log(`---------------------------------------------------------------------------------`);
     }
 
     catch (error) {
@@ -131,8 +156,11 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 }
 
 const loopCsvRecords = async (error: any, csvRecords: any) => {
-    for (let record in csvRecords) {
-      const { RoleName } = csvRecords[record];
+    for (let index = 0; index < csvRecords.length; index++) {
+      const { RoleName } = csvRecords[index];
+      console.log(`---------------------------------------------------------------------------------`);
+      console.log(`[${index+1}] Processing role: ${RoleName}`);
+
       await processAWSManagedPolicyRemediation(RoleName);
     }
 }
