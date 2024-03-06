@@ -152,11 +152,13 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
     for (let index = 0; index < csvRecords.length; index++) {
         const { RoleName } = csvRecords[index];
         
+        console.log("------------------------------------------------------------------------------------------");
         console.log(`[${index+1}] Processing role: ${RoleName}\n`);
         
         await processAWSManagedPolicyRemediation(RoleName);
         
         console.log(`\nDone processing role: ${RoleName}\n`);
+        console.log("------------------------------------------------------------------------------------------");
     }
 }
 
