@@ -55,7 +55,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolices.csv");
+            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolicies.csv");
         }
     }
 
