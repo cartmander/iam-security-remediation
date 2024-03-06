@@ -3,9 +3,7 @@ import {
     GetPolicyCommand, 
     GetPolicyCommandOutput, 
     GetPolicyVersionCommand,
-    LimitExceededException,
     PutRolePolicyCommand, 
-    PutRolePolicyCommandOutput
 } from "@aws-sdk/client-iam";
 import { client } from "../client.js";
 import { parse } from "csv-parse";
@@ -127,7 +125,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
         const awsManagedPoliciesLength = awsManagedPolicies.length;
 
         if (awsManagedPoliciesLength != 0 ) {
-            console.log(`AWS Managed Policies:`, awsManagedPolicies);
+            console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
             awsManagedPolicies.forEach(async (policy, index) => {
                 const processedPolicies = await convertManagedPolicyToInline(roleName, policy!, index+1, awsManagedPoliciesLength);
@@ -145,9 +143,6 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
         }
-
-        //console.log(`Done processing role: ${roleName} and its policies`);
-        //console.log(`---------------------------------------------------------------------------------`);
     }
 
     catch (error) {
