@@ -1,10 +1,8 @@
-import { GetPolicyCommand, GetRolePolicyCommand } from "@aws-sdk/client-iam";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
-import { client } from "../client.js";
+import { getInlinePoliciesByRoleName, getRolePolicyDocument } from "../../helpers/policies.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
-import { getInlinePoliciesByRoleName } from "../../helpers/policies.js";
 
 interface BasePolicy {
     Version: string;
@@ -16,8 +14,6 @@ interface Statement {
     Action: string[] | string;
     Resource: string;
 }
-
-// const updatePolicyDocument = async 
 
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<any> => {
     try {
@@ -72,29 +68,9 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
     }  
 }
 
-const getPolicyDocument = async (roleName: string, policyName: string): Promise<BasePolicy> => {
-    try {
-        const getRolePolicyCommandInput = {
-            RoleName: roleName,
-            PolicyName: policyName
-        }
-
-        const command = new GetRolePolicyCommand(getRolePolicyCommandInput);
-        const response = await client.send(command);
-
-        const policyDocument = JSON.parse(decodeURIComponent(response.PolicyDocument!));
-
-        return policyDocument;
-    }
-
-    catch (error) {
-        throw new Error(`Unable to get Policy Document of this Policy Name: ${policyName}`);
-    }
-}
-
 const convertWildcardPermissionsToSpecificActions = async (roleName: string, policyName: string): Promise<any> => {
     try {
-        const policyDocument = await getPolicyDocument(roleName, policyName);
+        const policyDocument = await getRolePolicyDocument(roleName, policyName);
 
         if (policyDocument) {
             const convertedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
