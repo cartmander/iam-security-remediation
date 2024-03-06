@@ -1,7 +1,6 @@
 import { 
     DetachRolePolicyCommand, 
     GetPolicyCommand, 
-    GetPolicyCommandOutput, 
     GetPolicyVersionCommand,
     PutRolePolicyCommand, 
 } from "@aws-sdk/client-iam";
@@ -97,7 +96,7 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted AWS Managed Policy: ${policyArn}`);
-            
+
             return true;
         }
 
@@ -163,7 +162,7 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
         console.log("------------------------------------------------------------------------------------------");
     }
 }
-
+// TODO: Add another summary for all roles with links or put it on a csv
 const main = async (csvPath: string) => {
     const headers = ["RoleName"];
     const csvFilePath = path.resolve(csvPath);
