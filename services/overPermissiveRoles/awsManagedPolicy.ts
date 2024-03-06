@@ -60,7 +60,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
     }
 
     catch (error) {
-        console.error(`Error getting inline policies for role: ${roleName}`, error);
+        console.error(`Error getting inline policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
     }
 }
 
@@ -79,8 +79,8 @@ const buildAWSManagedRemediationCsv = (roleName: string, policy: string, status:
         }
     }
   
-    catch (error: any) {
-      console.log(`Error building IAM csv for role: ${roleName}: `, error.message);
+    catch (error) {
+      console.log(`Error building IAM csv for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
       return;
     }
   }
