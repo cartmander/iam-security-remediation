@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "aws-managed-roles": "tsc && node dist/services/overPermissiveRoles/awsManagedPolicy.js",
+    "aws-managed-policies": "tsc && node dist/services/overPermissiveRoles/awsManagedPolicies.js",
     "wildcard-permissions": "tsc && node dist/services/overPermissiveRoles/wildcardPermissions.js"
   },
   "author": "",
