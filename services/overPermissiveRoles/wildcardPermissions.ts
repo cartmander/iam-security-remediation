@@ -1,4 +1,4 @@
-import { getInlinePoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, getRolePolicyDocument, createPolicyDocumentInRoleAsInline } from "../../helpers/policies.js";
+import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline } from "../../helpers/policies.js";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
 import { parse } from "csv-parse";
