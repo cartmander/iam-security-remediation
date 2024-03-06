@@ -45,7 +45,6 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
                 let processedPolicies = await convertManagedPolicyToInline(roleName, policy, index + 1, awsManagedPoliciesLength);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
-                
                 buildRemediationCsv(roleName, policy, processedPolicies, "awsManagedPolicy.csv");
             }
 
