@@ -40,7 +40,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
             console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
 
-            for (let index = 0; index < awsManagedPolicies.length; index++) {
+            for (let index = 0; index < awsManagedPoliciesLength; index++) {
                 const policy = awsManagedPolicies[index];
                 let processedPolicies = await convertManagedPolicyToInline(roleName, policy, index + 1, awsManagedPoliciesLength);
 
