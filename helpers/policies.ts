@@ -99,7 +99,7 @@ export const deleteAWSManagedPolicyInRole = async (roleName: string, policyName:
     }
 }
 
-export const getAWSManagedPoliciesByRoleName = async (roleName: string): Promise<string[]> => {
+export const getAWSManagedPoliciesByRoleName = async (roleName: string): Promise<any> => {
     try {
         const listAttachedRolePoliciesCommandInput = {
             RoleName: roleName
@@ -107,7 +107,7 @@ export const getAWSManagedPoliciesByRoleName = async (roleName: string): Promise
 
         const command = new ListAttachedRolePoliciesCommand(listAttachedRolePoliciesCommandInput);
         const response = await client.send(command);
-
+        
         const attachedPolicies = response.AttachedPolicies!;
         const awsManagedPolicies = attachedPolicies.filter((policy) => isAWSManagedPolicy(policy.PolicyArn || "")).map(policy => policy.PolicyArn || "");
 
