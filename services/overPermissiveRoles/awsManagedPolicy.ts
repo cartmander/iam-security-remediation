@@ -1,14 +1,9 @@
-import { 
-    DetachRolePolicyCommand, 
-    GetPolicyCommand, 
-    GetPolicyVersionCommand,
-    PutRolePolicyCommand, 
-} from "@aws-sdk/client-iam";
+import { DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, PutRolePolicyCommand, } from "@aws-sdk/client-iam";
+import { getAWSManagedPoliciesByRoleName } from "../../helpers/policies.js";
 import { client } from "../client.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
-import { getAWSManagedPoliciesByRoleName } from "../../helpers/policies.js";
 
 const getPolicyVersion = async (policyArn: string) : Promise<any> => {
     try {
@@ -91,6 +86,7 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
         const policyName = policyVersion.Policy?.PolicyName || "";
 
         const policyDocument = await getPolicyDocument(policyDefaultVersionId, policyArn);
+
         const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
 
         if (convertedPolicyDocument) {
@@ -116,16 +112,18 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
         const awsManagedPolicies = await getAWSManagedPoliciesByRoleName(roleName);
         const awsManagedPoliciesLength = awsManagedPolicies.length;
 
-        if (awsManagedPoliciesLength != 0 ) {
+        if (awsManagedPoliciesLength != 0) {
             console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
 
             for (let index = 0; index < awsManagedPolicies.length; index++) {
                 const policy = awsManagedPolicies[index];
                 processedPolicies = await convertManagedPolicyToInline(roleName, policy, index+1, awsManagedPoliciesLength);
+
                 if (processedPolicies) {
                     convertedPolicies = convertedPolicies.concat(policy);
                 }
+                
                 else {
                     notConvertedPolicies = notConvertedPolicies.concat(policy);
                 }
