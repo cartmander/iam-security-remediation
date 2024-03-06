@@ -96,6 +96,8 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
 
         if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
+            console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted AWS Managed Policy: ${policyArn}`);
+            
             return true;
         }
 
