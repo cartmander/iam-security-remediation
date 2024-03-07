@@ -4,7 +4,7 @@
 This automation remediates and resolves most audit issues related to overly-permissive roles.
 
 ## Scope
-- **Transforms AWS managed policies into inline policies** - AWS Managed policies have over permissive nature and are considered fixed and uneditable. This automation transforms AWS managed policies into Customer inline policies.
+- **Resolves concerns related to AWS managed policies** - AWS Managed policies have over permissive nature and are considered fixed and uneditable. This automation transforms AWS managed policies into Customer inline policies.
 - **Resolves permissions with wildcards** - CloudGov reports issues related to IAM roles that contain policies that have over permissive nature such as containing wildcards ```Example: s3:*, ec2:* ```. As the remediator, it is difficult to determine which specific actions are only being used. This automation expounds the wildcard permission by explicitly defining the permissions of a service found in the policy document of a given role. This automation only works with Customer managed and inline policies.
 
 ## Limitation
