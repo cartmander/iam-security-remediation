@@ -1,9 +1,48 @@
-import { CreatePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
+import { CreatePolicyVersionCommand, DeletePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListPolicyVersionsCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
 import { OverPermissiveRolesMessage, PolicyType } from "../enums/enumTypes.js";
 import { client } from "../services/client.js";
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {
     return policyArn.startsWith("arn:aws:iam::aws:policy/");
+}
+
+const listPolicyVersions = async (policyArn: string): Promise<any> => {
+    try {
+        const listPolicyVersionsCommandInput = {
+            PolicyArn: policyArn
+        }
+
+        const command = new ListPolicyVersionsCommand(listPolicyVersionsCommandInput);
+        const response = await client.send(command);
+
+        return response.Versions;
+    }
+
+    catch (error) {
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        throw new Error(`Unable to list policy versions of this policy ARN ${policyArn}: ${errorMessage}`);
+    }
+}
+
+const deletePolicyVersion = async (policyArn: string, versionId: string): Promise<any> => {
+    try {
+        const deletePolicyVersionCommandInput = {
+            PolicyArn: policyArn,
+            VersionId: versionId
+        }
+
+        const command = new DeletePolicyVersionCommand(deletePolicyVersionCommandInput);
+        const response = await client.send(command);
+
+        console.log(response);
+
+        return response;
+    }
+
+    catch (error) {
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        throw new Error(`Unable to delete policy version of this policy ARN ${policyArn}: ${errorMessage}`);
+    }
 }
 
 export const getPolicyVersion = async (policyArn: string) : Promise<any> => {
@@ -96,7 +135,7 @@ export const createPolicyVersionInRoleAsCustomerManaged = async (policyDocument:
             PolicyArn: policyArn,
             SetAsDefault: true
         }
-
+        
         const command = new CreatePolicyVersionCommand(createPolicyVersionCommand);
         const response = await client.send(command);
         
@@ -190,7 +229,7 @@ export const getRoleTags = async (roleName: string): Promise<any> => {
         
         let platformTag;
         const platformExists = response.Tags?.find(tag => tag.Key === "PLATFORM");
-        
+
         if (!response.Tags || response.Tags.length === 0 || !platformExists) {
             platformTag = OverPermissiveRolesMessage.NO_TAG;
         }
