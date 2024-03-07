@@ -15,9 +15,10 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
         const policyDocument = await getPolicyVersionDocument(policyArn);
         
         policyName = policyVersion.Policy.PolicyName;
-        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(policyDocument, roleName, policyName);
 
-        if (policyVersion && policyDocument && convertedPolicyDocument) {
+        const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(JSON.stringify(policyDocument), roleName, policyName);
+
+        if (convertedPolicyDocument) {
             await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted AWS Managed Policy: ${policyArn}`);
 
@@ -62,7 +63,6 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            //buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_AWS_MANAGED, PolicyType.AWS_MANAGED, false, OverPermissiveRolesMessage.NO_AWS_MANAGED, platformTag.Value, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
         }
     }
 

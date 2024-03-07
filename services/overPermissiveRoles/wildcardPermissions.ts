@@ -17,6 +17,42 @@ interface Statement {
     Resource: string;
 }
 
+const explicitlyDefineActionAsArray = (statement: Statement, actions: string[], explicitlyDefinedActions: string[]) => {
+    const wildcardExists: boolean = actions.some(action => action.includes(":*"));
+    
+    if (wildcardExists) {
+        actions.forEach(action => {
+            if (action.includes(":*")) {
+                const service: string = action.split(":")[0];
+                const servicePermissions: any = generatePermissionsForService(service);
+                servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+            }
+
+            else {
+                explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
+            }
+        });
+
+        statement.Action = explicitlyDefinedActions;
+    }
+}
+
+const explicitlyDefineActionAsString = (statement: Statement, actions: string, explicitlyDefinedActions: string[]) => {
+    const wildcardExists: boolean = actions.includes(":*");
+
+    if (wildcardExists) {
+        const service: string = actions.split(":")[0];
+        const servicePermissions: any = generatePermissionsForService(service);
+        servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+    }
+
+    else {
+        explicitlyDefinedActions = explicitlyDefinedActions.concat(actions);
+    }
+
+    statement.Action = explicitlyDefinedActions;
+}
+
 const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, policyName: string): Promise<any> => {
     try {
         const statements: Statement[] = policyDocument.Statement;
@@ -26,39 +62,11 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
             let explicitlyDefinedActions: string[] = [];
 
             if (Array.isArray(actions)) {
-                const wildcardExists: boolean = actions.some(action => action.includes(":*"));
-    
-                if (wildcardExists) {
-                    actions.forEach(action => {
-                        if (action.includes(":*")) {
-                            const service: string = action.split(":")[0];
-                            const servicePermissions: any = generatePermissionsForService(service);
-                            servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
-                        }
-    
-                        else {
-                            explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
-                        }
-                    });
-    
-                    statement.Action = explicitlyDefinedActions;
-                }
+                explicitlyDefineActionAsArray(statement, actions, explicitlyDefinedActions);
             }
 
             else {
-                const wildcardExists: boolean = actions.includes(":*");
-
-                if (wildcardExists) {
-                    const service: string = actions.split(":")[0];
-                    const servicePermissions: any = generatePermissionsForService(service);
-                    servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
-                }
-
-                else {
-                    explicitlyDefinedActions = explicitlyDefinedActions.concat(actions);
-                }
-
-                statement.Action = explicitlyDefinedActions;
+                explicitlyDefineActionAsString(statement, actions, explicitlyDefinedActions);
             }
         });
         
@@ -79,7 +87,7 @@ const convertInlinePermissionsToSpecificActions = async (roleName: string, polic
         const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
         const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(JSON.stringify(explicitlyDefinedDocument), roleName, policyName);
 
-        if (policyDocument && explicitlyDefinedDocument && convertedPolicyDocument) {
+        if (convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Inline Policy: ${policyName}`);
 
             buildRemediationCsv(roleName, policyName, PolicyType.INLINE, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
@@ -110,7 +118,7 @@ const convertCustomerManagedPermissionsToSpecificActions = async (roleName: stri
         const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
         const convertedPolicyDocument = await createPolicyVersionInRoleAsCustomerManaged(JSON.stringify(explicitlyDefinedDocument), policyArn, policyName);
         
-        if (policyVersion && policyDocument && explicitlyDefinedDocument && convertedPolicyDocument) {
+        if (convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Customer Managed Policy: ${policyName}`);
 
             buildRemediationCsv(roleName, policyName, PolicyType.CUSTOMER_MANAGED, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
@@ -190,7 +198,6 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         else {
             console.log(`No Inline Policies attached to Role ${roleName}`);
-            //buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
