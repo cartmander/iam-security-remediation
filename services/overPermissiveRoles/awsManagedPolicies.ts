@@ -51,7 +51,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
             for (let index = 0; index < awsManagedPoliciesLength; index++) {
                 const policyArn = awsManagedPolicies[index];
-                let processedPolicies = await convertManagedPolicyToInline(roleName, policyArn, index + 1, awsManagedPoliciesLength, platformTag.Value);
+                let processedPolicies = await convertManagedPolicyToInline(roleName, policyArn, index + 1, awsManagedPoliciesLength, platformTag);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policyArn) : notConvertedPolicies = notConvertedPolicies.concat(policyArn);
             }

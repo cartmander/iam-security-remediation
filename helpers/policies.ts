@@ -1,5 +1,5 @@
 import { CreatePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
-import { PolicyType } from "../enums/enumTypes.js";
+import { OverPermissiveRolesMessage, PolicyType } from "../enums/enumTypes.js";
 import { client } from "../services/client.js";
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {
@@ -187,10 +187,19 @@ export const getRoleTags = async (roleName: string): Promise<any> => {
 
         const command = new ListRoleTagsCommand(listRoleTagsCommandInput);
         const response = await client.send(command);
+        
+        let platformTag;
+        const platformExists = response.Tags?.find(tag => tag.Key === "PLATFORM");
+        
+        if (!response.Tags || response.Tags.length === 0 || !platformExists) {
+            platformTag = OverPermissiveRolesMessage.NO_TAG;
+        }
 
-        const tag = response.Tags?.find(tag => tag.Key === "PLATFORM");
+        else {
+            platformTag = platformExists.Value;
+        }
 
-        return tag;
+        return platformTag;
     }
 
     catch (error) {

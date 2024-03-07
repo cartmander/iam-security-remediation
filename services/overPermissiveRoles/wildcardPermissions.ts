@@ -150,7 +150,7 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
             for (let index = 0; index < customerManagedPoliciesLength; index++) {
                 const policy = customerManagedPolicies[index];
-                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength, platformTag.Value);
+                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength, platformTag);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
             }
@@ -185,7 +185,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
             for (let index = 0; index < inlinePoliciesLength; index++) {
                 const policy = inlinePolicies[index];
-                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength, platformTag.Value);
+                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength, platformTag);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
             }
