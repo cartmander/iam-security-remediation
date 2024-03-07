@@ -176,7 +176,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
             for (let index = 0; index < inlinePoliciesLength; index++) {
                 const policy = inlinePolicies[index];
-                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength, platformTag);
+                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength, platformTag.Value);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
             }
@@ -188,7 +188,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         else {
             console.log(`No Inline Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_INLINE, platformTag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Valuef, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
