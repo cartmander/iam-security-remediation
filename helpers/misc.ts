@@ -7,7 +7,7 @@ export const buildRemediationCsv = (roleName: string, policy: string, policyType
   
     try {
         if (!fs.existsSync(roleCsv)) {
-            fs.mkdirSync(roleDirectory,  { recursive: true });
+            fs.mkdirSync(roleDirectory, { recursive: true });
             fs.writeFileSync(roleCsv, "RoleName,Policy,PolicyType,WasProcessed,Error,Tag,URL\n");
         }
 
