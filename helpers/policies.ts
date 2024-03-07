@@ -128,7 +128,6 @@ export const deleteAWSManagedPolicyInRole = async (roleName: string, policyName:
 
 export const getManagedPoliciesByRoleName = async (roleName: string, managedPolicyType: string): Promise<any> => {
     try {
-
         let managedPolicies;
 
         const listAttachedRolePoliciesCommandInput = {
