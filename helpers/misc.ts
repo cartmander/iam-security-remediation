@@ -1,5 +1,9 @@
 import fs from "fs";
 
+const escapeComma = (field: string) => {
+    return field.replaceAll(",", "");
+}
+
 export const buildRemediationCsv = (roleName: string, policy: string, policyType: string, wasProcessed: boolean, error: string, tag: string, csvFileName: string) => {
     const roleDirectory = `results/overPermissiveRoles`;
     const roleCsv = `${roleDirectory}/${csvFileName}`;
@@ -11,7 +15,7 @@ export const buildRemediationCsv = (roleName: string, policy: string, policyType
             fs.writeFileSync(roleCsv, "RoleName,Policy,PolicyType,WasProcessed,Error,Tag,URL\n");
         }
 
-        fs.appendFileSync(roleCsv, `${roleName},${policy},${policyType},${wasProcessed},${error},${tag},${url}\n`);
+        fs.appendFileSync(roleCsv, `${roleName},${escapeComma(policy)},${policyType},${wasProcessed},${escapeComma(error)},${escapeComma(tag)},${url}\n`);
     }
   
     catch (error) {
