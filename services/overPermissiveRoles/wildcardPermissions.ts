@@ -162,7 +162,6 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
         else {
             console.log(`No Customer Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
