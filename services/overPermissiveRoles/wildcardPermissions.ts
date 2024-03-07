@@ -142,7 +142,7 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
             for (let index = 0; index < customerManagedPoliciesLength; index++) {
                 const policy = customerManagedPolicies[index];
-                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength, platformTag);
+                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength, platformTag.Value);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
             }
@@ -154,7 +154,7 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
         else {
             console.log(`No Customer Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, platformTag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
@@ -190,7 +190,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         else {
             console.log(`No Inline Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Valuef, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
