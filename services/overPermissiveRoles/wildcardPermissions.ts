@@ -79,7 +79,7 @@ const convertInlinePermissionsToSpecificActions = async (roleName: string, polic
         const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
         const convertedPolicyDocument = await createPolicyDocumentInRoleAsInline(JSON.stringify(explicitlyDefinedDocument), roleName, policyName);
 
-        if (convertedPolicyDocument) {
+        if (policyDocument && explicitlyDefinedDocument && convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Inline Policy: ${policyName}`);
 
             buildRemediationCsv(roleName, policyName, PolicyType.INLINE, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
@@ -98,20 +98,22 @@ const convertInlinePermissionsToSpecificActions = async (roleName: string, polic
 }
 
 const convertCustomerManagedPermissionsToSpecificActions = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number, tag: string): Promise<any> => {
+    let policyName;
+    
     try {
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting Customer Managed Policy: ${policyArn}`);
 
         const policyVersion = await getPolicyVersion(policyArn);
         const policyDocument = await getPolicyVersionDocument(policyArn);
         
-        const policyName = policyVersion.Policy.PolicyName;
+        policyName = policyVersion.Policy.PolicyName;
         const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
         const convertedPolicyDocument = await createPolicyVersionInRoleAsCustomerManaged(JSON.stringify(explicitlyDefinedDocument), policyArn, policyName);
         
-        if (convertedPolicyDocument) {
+        if (policyVersion && policyDocument && explicitlyDefinedDocument && convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Customer Managed Policy: ${policyName}`);
 
-            buildRemediationCsv(roleName, policyArn, PolicyType.CUSTOMER_MANAGED, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+            buildRemediationCsv(roleName, policyName, PolicyType.CUSTOMER_MANAGED, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
             return true;
         }
 
@@ -122,7 +124,7 @@ const convertCustomerManagedPermissionsToSpecificActions = async (roleName: stri
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
         console.error(`Unable to convert and update customer managed policy ${policyArn}: ${errorMessage}`);
 
-        buildRemediationCsv(roleName, policyArn, PolicyType.CUSTOMER_MANAGED, false, errorMessage, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+        buildRemediationCsv(roleName, policyName, PolicyType.CUSTOMER_MANAGED, false, errorMessage, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
     }
 }
 
