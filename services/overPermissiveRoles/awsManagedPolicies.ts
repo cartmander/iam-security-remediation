@@ -1,11 +1,11 @@
-import { getManagedPoliciesByRoleName, getPolicyVersionDocument, getPolicyVersion, createPolicyDocumentInRoleAsInline, deleteAWSManagedPolicyInRole } from "../../helpers/policies.js";
+import { getManagedPoliciesByRoleName, getPolicyVersionDocument, getPolicyVersion, createPolicyDocumentInRoleAsInline, deleteAWSManagedPolicyInRole, getRoleTags } from "../../helpers/policies.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
-import { ManagedPolicyType } from "../../enums/enumTypes.js";
+import { OverPermissiveRolesCsv, OverPermissiveRolesMessage, PolicyType } from "../../enums/enumTypes.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
-const convertManagedPolicyToInline = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
+const convertManagedPolicyToInline = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number, tag: string): Promise<any> => {
     try {
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting AWS Managed Policy: ${policyArn}`);
 
@@ -19,14 +19,20 @@ const convertManagedPolicyToInline = async (roleName: string, policyArn: string,
             await deleteAWSManagedPolicyInRole(roleName, policyName, policyArn);
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted AWS Managed Policy: ${policyArn}`);
 
+            buildRemediationCsv(roleName, policyArn, PolicyType.AWS_MANAGED, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
             return true;
         }
-
-        return false;
+        
+        else {
+            return false;
+        }
     }
 
     catch (error) {
-        console.error("Error: ", error);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Unable to convert AWS managed policy ${policyArn}: ${errorMessage}`);
+
+        buildRemediationCsv(roleName, policyArn, PolicyType.AWS_MANAGED, false, errorMessage, tag, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
     }
 }
 
@@ -34,19 +40,19 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
     try {
         let convertedPolicies: string[] = [], notConvertedPolicies: string[] = [];
 
-        const awsManagedPolicies = await getManagedPoliciesByRoleName(roleName, ManagedPolicyType.AWS_MANAGED);
+        const awsManagedPolicies = await getManagedPoliciesByRoleName(roleName, PolicyType.AWS_MANAGED);
         const awsManagedPoliciesLength = awsManagedPolicies.length;
+        const platformTag = await getRoleTags(roleName);
 
         if (awsManagedPoliciesLength != 0) {
             console.log(`AWS Managed Policies of Role ${roleName}:`, awsManagedPolicies);
             console.log(`Total AWS Managed Policies: ${awsManagedPoliciesLength}`);
 
             for (let index = 0; index < awsManagedPoliciesLength; index++) {
-                const policy = awsManagedPolicies[index];
-                let processedPolicies = await convertManagedPolicyToInline(roleName, policy, index + 1, awsManagedPoliciesLength);
+                const policyArn = awsManagedPolicies[index];
+                let processedPolicies = await convertManagedPolicyToInline(roleName, policyArn, index + 1, awsManagedPoliciesLength, platformTag);
 
-                processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
-                buildRemediationCsv(roleName, policy, processedPolicies, "awsManagedPolicies.csv");
+                processedPolicies ? convertedPolicies = convertedPolicies.concat(policyArn) : notConvertedPolicies = notConvertedPolicies.concat(policyArn);
             }
 
             console.log(`\nSummary for Role: ${roleName}`);
@@ -56,12 +62,13 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, "<No AWS Managed Policies attached>", false, "awsManagedPolicies.csv");
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_AWS_MANAGED, PolicyType.AWS_MANAGED, false, OverPermissiveRolesMessage.NO_AWS_MANAGED, platformTag, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
         }
     }
 
     catch (error) {
-        console.error(`Error getting inline policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Error getting AWS managed policies for role: ${roleName}: ${errorMessage}`);
     }
 }
 

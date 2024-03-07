@@ -1,10 +1,10 @@
-import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged } from "../../helpers/policies.js";
+import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged, getRoleTags } from "../../helpers/policies.js";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
-import { ManagedPolicyType } from "../../enums/enumTypes.js";
+import { PolicyType, OverPermissiveRolesCsv, OverPermissiveRolesMessage } from "../../enums/enumTypes.js";
 import { parse } from "csv-parse";
 import path from "path";
-import fs, { stat } from "fs";
+import fs from "fs";
 
 interface BasePolicy {
     Version: string;
@@ -66,11 +66,12 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
     }
 
     catch (error) {
-        console.error(`Unable to explicitly define wildcard permissions of this policy name ${policyName}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Unable to explicitly define wildcard permissions of policy name ${policyName}: ${errorMessage}`);
     }  
 }
 
-const convertInlinePermissionsToSpecificActions = async (roleName: string, policyName: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
+const convertInlinePermissionsToSpecificActions = async (roleName: string, policyName: string, policyPlacement: number, totalPolicies: number, tag: string): Promise<any> => {
     try {
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting Inline Policy: ${policyName}`);
 
@@ -81,6 +82,7 @@ const convertInlinePermissionsToSpecificActions = async (roleName: string, polic
         if (convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Inline Policy: ${policyName}`);
 
+            buildRemediationCsv(roleName, policyName, PolicyType.INLINE, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
             return true;
         }
 
@@ -88,11 +90,14 @@ const convertInlinePermissionsToSpecificActions = async (roleName: string, polic
     }
 
     catch (error) {
-        console.error("Error: ", error);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Unable to convert and update inline policy ${policyName}: ${errorMessage}`);
+
+        buildRemediationCsv(roleName, policyName, PolicyType.INLINE, false, errorMessage, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
     }
 }
 
-const convertCustomerManagedPermissionsToSpecificActions = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
+const convertCustomerManagedPermissionsToSpecificActions = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number, tag: string): Promise<any> => {
     try {
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting Customer Managed Policy: ${policyArn}`);
 
@@ -106,6 +111,7 @@ const convertCustomerManagedPermissionsToSpecificActions = async (roleName: stri
         if (convertedPolicyDocument) {
             console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Customer Managed Policy: ${policyName}`);
 
+            buildRemediationCsv(roleName, policyArn, PolicyType.CUSTOMER_MANAGED, true, OverPermissiveRolesMessage.NO_ERROR, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
             return true;
         }
 
@@ -113,7 +119,10 @@ const convertCustomerManagedPermissionsToSpecificActions = async (roleName: stri
     }
 
     catch (error) {
-        console.error("Error: ", error);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Unable to convert and update customer managed policy ${policyArn}: ${errorMessage}`);
+
+        buildRemediationCsv(roleName, policyArn, PolicyType.CUSTOMER_MANAGED, false, errorMessage, tag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
     }
 }
 
@@ -121,8 +130,9 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
     try {
         let convertedPolicies: string[] = [], notConvertedPolicies: string[] = [];
 
-        const customerManagedPolicies = await getManagedPoliciesByRoleName(roleName, ManagedPolicyType.CUSTOMER_MANAGED);
+        const customerManagedPolicies = await getManagedPoliciesByRoleName(roleName, PolicyType.CUSTOMER_MANAGED);
         const customerManagedPoliciesLength = customerManagedPolicies.length;
+        const platformTag = await getRoleTags(roleName);
 
         if (customerManagedPolicies.length != 0) {
             console.log(`Customer Managed Policies of Role ${roleName}:`, customerManagedPolicies);
@@ -130,10 +140,9 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
             for (let index = 0; index < customerManagedPoliciesLength; index++) {
                 const policy = customerManagedPolicies[index];
-                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength);
+                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength, platformTag);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
-                buildRemediationCsv(roleName, policy, processedPolicies, "wildcardPermissions.csv");
             }
 
             console.log(`\nSummary for Role: ${roleName}`);
@@ -143,12 +152,13 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
 
         else {
             console.log(`No Customer Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, "<No Customer Managed Policies attached>", false, "wildcardPermissions.csv");
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED, platformTag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
     catch (error) {
-        console.error(`Error getting customer managed policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Error getting customer managed policies for role: ${roleName}: ${errorMessage}`);
     }
 }
 
@@ -158,6 +168,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         const inlinePolicies = await getInlinePoliciesByRoleName(roleName);
         const inlinePoliciesLength = inlinePolicies.length;
+        const platformTag = await getRoleTags(roleName);
 
         if (inlinePolicies.length != 0) {
             console.log(`Inline Policies of Role ${roleName}:`, inlinePolicies);
@@ -165,10 +176,9 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
             for (let index = 0; index < inlinePoliciesLength; index++) {
                 const policy = inlinePolicies[index];
-                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength);
+                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength, platformTag);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
-                buildRemediationCsv(roleName, policy, processedPolicies, "wildcardPermissions.csv");
             }
 
             console.log(`\nSummary for Role: ${roleName}`);
@@ -178,12 +188,13 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         else {
             console.log(`No Inline Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, "<No Inline Policies attached>", false, "wildcardPermissions.csv");
+            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.CUSTOMER_MANAGED, false, OverPermissiveRolesMessage.NO_INLINE, platformTag, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
     catch (error) {
-        console.error(`Error getting inline policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        console.error(`Error getting inline policies for role: ${roleName}: ${errorMessage}`);
     }
 }
 
