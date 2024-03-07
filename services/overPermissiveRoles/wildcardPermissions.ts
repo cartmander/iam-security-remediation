@@ -195,6 +195,9 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
         console.log(`\n[${index + 1}] Processing role: ${RoleName}\n`);
         
         await processInlinePermissionsRemediation(RoleName);
+
+        console.log("\n");
+
         await processCustomerManagedPermissionsRemediation(RoleName);
         
         console.log(`\nDone processing role: ${RoleName}\n`);
