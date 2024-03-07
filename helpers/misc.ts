@@ -11,7 +11,7 @@ export const buildRemediationCsv = (roleName: string, policy: string, policyType
             fs.writeFileSync(roleCsv, "RoleName,Policy,PolicyType,WasProcessed,Error,Tag,URL\n");
         }
 
-        fs.appendFileSync(roleCsv, `${roleName},${policy},${wasProcessed},${url}\n`);
+        fs.appendFileSync(roleCsv, `${roleName},${policy},${policyType},${wasProcessed},${error},${tag},${url}\n`);
     }
   
     catch (error) {
