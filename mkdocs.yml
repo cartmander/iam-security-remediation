@@ -1,5 +1,5 @@
-site_name: AWS IAM Least Privilege Automation Docs
-site_description: Documentation for AWS IAM Least Privilege Automation
+site_name: IAM Security Remediation Docs
+site_description: Documentation for IAM Security Remediation
 
 nav:
   - Introduction: index.md

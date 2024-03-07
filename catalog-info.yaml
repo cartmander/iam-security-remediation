@@ -1,17 +1,17 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-    name: iam-role-access-advisor
+    name: iam-security-remediation
     description: |
-        AWS IAM Least Privilege Automation
+        IAM Security Remediation
     tags:
         - ubreakifix
         - documentation
         - typescript
         - iam
     annotations:
-        github.com/project-slug: asurion-private/iam-role-access-advisor
-        backstage.io/techdocs-ref: url:https://github.com/asurion-private/iam-role-access-advisor/tree/main
+        github.com/project-slug: asurion-private/iam-security-remediation
+        backstage.io/techdocs-ref: url:https://github.com/asurion-private/iam-security-remediation/tree/main
     namespace: default
 spec:
     type: Service

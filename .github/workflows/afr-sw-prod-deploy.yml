@@ -17,7 +17,7 @@ jobs:
   call-workflow-passing-data:
     uses: asurion-private/afr-shared-workflow/.github/workflows/shared-workflow.yaml@v2.6.3
     with:
-      repo: iam-role-access-advisor
+      repo: iam-security-remediation
       branchToCheckout: main
       runner: common-8gb-or-smaller
       aframeFilePath: ./infrastructure/aframe.prod.yaml
