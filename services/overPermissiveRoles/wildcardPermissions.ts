@@ -1,9 +1,10 @@
-import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline } from "../../helpers/policies.js";
+import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged } from "../../helpers/policies.js";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
+import { ManagedPolicyType } from "../../enums/enumTypes.js";
 import { parse } from "csv-parse";
 import path from "path";
-import fs from "fs";
+import fs, { stat } from "fs";
 
 interface BasePolicy {
     Version: string;
@@ -69,7 +70,7 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
     }  
 }
 
-const convertWildcardPermissionsToSpecificActions = async (roleName: string, policyName: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
+const convertInlinePermissionsToSpecificActions = async (roleName: string, policyName: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
     try {
         console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting Inline Policy: ${policyName}`);
 
@@ -91,15 +92,72 @@ const convertWildcardPermissionsToSpecificActions = async (roleName: string, pol
     }
 }
 
-const processWildcardPermissionsRemediation = async (roleName: string): Promise<void> => {
+const convertCustomerManagedPermissionsToSpecificActions = async (roleName: string, policyArn: string, policyPlacement: number, totalPolicies: number): Promise<any> => {
+    try {
+        console.log(`\n[${policyPlacement} out of ${totalPolicies}] Converting Customer Managed Policy: ${policyArn}`);
+
+        const policyVersion = await getPolicyVersion(policyArn);
+        const policyDocument = await getPolicyVersionDocument(policyArn);
+        
+        const policyName = policyVersion.Policy.PolicyName;
+        const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
+        const convertedPolicyDocument = await createPolicyVersionInRoleAsCustomerManaged(JSON.stringify(explicitlyDefinedDocument), policyArn, policyName);
+        
+        if (convertedPolicyDocument) {
+            console.log(`\n[${policyPlacement} out of ${totalPolicies}] Successfully converted Customer Managed Policy: ${policyName}`);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    catch (error) {
+        console.error("Error: ", error);
+    }
+}
+
+const processCustomerManagedPermissionsRemediation = async (roleName: string): Promise<void> => {
+    try {
+        let convertedPolicies: string[] = [], notConvertedPolicies: string[] = [];
+
+        const customerManagedPolicies = await getManagedPoliciesByRoleName(roleName, ManagedPolicyType.CUSTOMER_MANAGED);
+        const customerManagedPoliciesLength = customerManagedPolicies.length;
+
+        if (customerManagedPolicies.length != 0) {
+            console.log(`Customer Managed Policies of Role ${roleName}:`, customerManagedPolicies);
+            console.log(`Total Customer Managed Policies: ${customerManagedPoliciesLength}`);
+
+            for (let index = 0; index < customerManagedPoliciesLength; index++) {
+                const policy = customerManagedPolicies[index];
+                let processedPolicies = await convertCustomerManagedPermissionsToSpecificActions(roleName, policy, index + 1, customerManagedPoliciesLength);
+
+                processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
+                buildRemediationCsv(roleName, policy, processedPolicies, "wildcardPermissions.csv");
+            }
+
+            console.log(`\nSummary for Role: ${roleName}`);
+            console.log(`\tSuccessfully processed Customer Managed Policies [${convertedPolicies.length} out of ${customerManagedPoliciesLength}]: `, convertedPolicies);
+            console.log(`\tFailed to process Customer Managed Policies [${notConvertedPolicies.length} out of ${customerManagedPoliciesLength}]: `, notConvertedPolicies);
+        }
+
+        else {
+            console.log(`No Customer Managed Policies attached to Role ${roleName}`);
+            buildRemediationCsv(roleName, "<No Customer Managed Policies attached>", false, "wildcardPermissions.csv");
+        }
+    }
+
+    catch (error) {
+        console.error(`Error getting customer managed policies for role: ${roleName}: ${(error as Error).name} - ${(error as Error).message}`);
+    }
+}
+
+const processInlinePermissionsRemediation = async (roleName: string): Promise<void> => {
     try {
         let convertedPolicies: string[] = [], notConvertedPolicies: string[] = [];
 
         const inlinePolicies = await getInlinePoliciesByRoleName(roleName);
         const inlinePoliciesLength = inlinePolicies.length;
-
-        console.log(`---------------------------------------------------------------------------------`);
-        console.log(`Processing role: ${roleName}`);
 
         if (inlinePolicies.length != 0) {
             console.log(`Inline Policies of Role ${roleName}:`, inlinePolicies);
@@ -107,7 +165,7 @@ const processWildcardPermissionsRemediation = async (roleName: string): Promise<
 
             for (let index = 0; index < inlinePoliciesLength; index++) {
                 const policy = inlinePolicies[index];
-                let processedPolicies = await convertWildcardPermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength);
+                let processedPolicies = await convertInlinePermissionsToSpecificActions(roleName, policy, index + 1, inlinePoliciesLength);
 
                 processedPolicies ? convertedPolicies = convertedPolicies.concat(policy) : notConvertedPolicies = notConvertedPolicies.concat(policy);
                 buildRemediationCsv(roleName, policy, processedPolicies, "wildcardPermissions.csv");
@@ -136,7 +194,8 @@ const loopCsvRecords = async (error: any, csvRecords: any) => {
         console.log("------------------------------------------------------------------------------------------");
         console.log(`\n[${index + 1}] Processing role: ${RoleName}\n`);
         
-        await processWildcardPermissionsRemediation(RoleName);
+        await processInlinePermissionsRemediation(RoleName);
+        await processCustomerManagedPermissionsRemediation(RoleName);
         
         console.log(`\nDone processing role: ${RoleName}\n`);
         console.log("------------------------------------------------------------------------------------------");

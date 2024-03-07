@@ -1,5 +1,6 @@
-import { getAWSManagedPoliciesByRoleName, getPolicyVersionDocument, getPolicyVersion, createPolicyDocumentInRoleAsInline, deleteAWSManagedPolicyInRole } from "../../helpers/policies.js";
+import { getManagedPoliciesByRoleName, getPolicyVersionDocument, getPolicyVersion, createPolicyDocumentInRoleAsInline, deleteAWSManagedPolicyInRole } from "../../helpers/policies.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
+import { ManagedPolicyType } from "../../enums/enumTypes.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
@@ -33,7 +34,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
     try {
         let convertedPolicies: string[] = [], notConvertedPolicies: string[] = [];
 
-        const awsManagedPolicies = await getAWSManagedPoliciesByRoleName(roleName);
+        const awsManagedPolicies = await getManagedPoliciesByRoleName(roleName, ManagedPolicyType.AWS_MANAGED);
         const awsManagedPoliciesLength = awsManagedPolicies.length;
 
         if (awsManagedPoliciesLength != 0) {
