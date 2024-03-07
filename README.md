@@ -14,9 +14,9 @@ This automation remediates and resolves most audit issues related to overly-perm
 - **Implement a workflow** - TBA
 
 ## How To Use
-- Branch out from ```main``` 
-- Populate the ```csvs/iamRoles.csv``` with roles using the following fields: ```RoleName```
-- ```export AWS_PROFILE=<AWS_ACCOUNT>.<ROLE> ``` - Set your AWS profile
+- Branch out from ```main```.
+- Populate the ```csvs/iamRoles.csv``` with roles using the following fields: ```RoleName```.
+- ```export AWS_PROFILE=<AWS_ACCOUNT>.<ROLE> ``` - Set your AWS profile.
 - ```npm run aws-managed-policies``` - this transforms detected AWS managed policies into Customer inline policies and proceeds with the deletion of the AWS managed policies.
 - ```npm run wildcard-permissions``` - this expounds the detected wildcard permissions by explicitly defining the permissions of a service. This only works with Customer managed and inline policies.
 - Results are shown in CSV format located in ```results/overPermissiveRoles```.
