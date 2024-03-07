@@ -62,7 +62,7 @@ const processAWSManagedPolicyRemediation = async (roleName: string): Promise<voi
 
         else {
             console.log(`No AWS Managed Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_AWS_MANAGED, PolicyType.AWS_MANAGED, false, OverPermissiveRolesMessage.NO_AWS_MANAGED, platformTag.Value, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
+            //buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_AWS_MANAGED, PolicyType.AWS_MANAGED, false, OverPermissiveRolesMessage.NO_AWS_MANAGED, platformTag.Value, OverPermissiveRolesCsv.AWS_MANAGED_POLICIES_CSV);
         }
     }
 

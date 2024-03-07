@@ -190,7 +190,7 @@ const processInlinePermissionsRemediation = async (roleName: string): Promise<vo
 
         else {
             console.log(`No Inline Policies attached to Role ${roleName}`);
-            buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
+            //buildRemediationCsv(roleName, OverPermissiveRolesMessage.NO_INLINE, PolicyType.INLINE, false, OverPermissiveRolesMessage.NO_INLINE, platformTag.Value, OverPermissiveRolesCsv.WILDCARD_PERMISSIONS_CSV);
         }
     }
 
