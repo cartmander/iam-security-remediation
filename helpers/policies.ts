@@ -19,7 +19,8 @@ export const getPolicyVersion = async (policyArn: string) : Promise<any> => {
     }
 
     catch (error) {
-        console.error(`Unable to get policy version of this policy ARN ${policyArn}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        throw new Error(`Unable to get policy version of this policy ARN ${policyArn}: ${errorMessage}`);
     }
 }
 
@@ -42,7 +43,8 @@ export const getPolicyVersionDocument = async (policyArn: string): Promise<any> 
     }
 
     catch (error) {
-        console.error(`Unable to get policy document of this policy ARN ${policyArn}: ${(error as Error).name} - ${(error as Error).message}`);
+        const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
+        throw new Error(`Unable to get policy document of this policy ARN ${policyArn}: ${errorMessage}`);
     }
 }
 
@@ -63,7 +65,7 @@ export const getRolePolicyDocument = async (roleName: string, policyName: string
 
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to get policy document of this policy name ${policyName}: ${errorMessage}`);
+        throw new Error(`Unable to get policy document of this policy name ${policyName}: ${errorMessage}`);
     }
 }
 
@@ -83,7 +85,7 @@ export const createPolicyDocumentInRoleAsInline = async (policyDocument: string,
 
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to create policy ${policyName} as inline: ${errorMessage}`);
+        throw new Error(`Unable to create policy ${policyName} as inline: ${errorMessage}`);
     }    
 }
 
@@ -103,7 +105,7 @@ export const createPolicyVersionInRoleAsCustomerManaged = async (policyDocument:
 
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to create policy version ${policyName} as customer managed: ${errorMessage}`);
+        throw new Error(`Unable to create policy version ${policyName} as customer managed: ${errorMessage}`);
     }    
 }
 
@@ -120,7 +122,7 @@ export const deleteAWSManagedPolicyInRole = async (roleName: string, policyName:
 
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to delete policy ${policyName} as AWS managed: ${errorMessage}`);
+        throw new Error(`Unable to delete policy ${policyName} as AWS managed: ${errorMessage}`);
     }
 }
 
@@ -154,7 +156,7 @@ export const getManagedPoliciesByRoleName = async (roleName: string, managedPoli
     
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to get AWS managed policies in this role ${roleName}: ${errorMessage}`);
+        throw new Error(`Unable to get AWS managed policies in this role ${roleName}: ${errorMessage}`);
     }
 }
 
@@ -174,7 +176,7 @@ export const getInlinePoliciesByRoleName = async (roleName: string): Promise<any
     
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to get inline policies in this role ${roleName}: ${errorMessage}`);
+        throw new Error(`Unable to get inline policies in this role ${roleName}: ${errorMessage}`);
     }
 }
 
@@ -194,6 +196,6 @@ export const getRoleTags = async (roleName: string): Promise<any> => {
 
     catch (error) {
         const errorMessage = `${(error as Error).name} - ${(error as Error).message}`;
-        console.error(`Unable to retrieve tag for this role ${roleName}: ${errorMessage}`);
+        throw new Error(`Unable to retrieve tag for this role ${roleName}: ${errorMessage}`);
     }
 }

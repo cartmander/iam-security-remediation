@@ -105,6 +105,8 @@ const convertCustomerManagedPermissionsToSpecificActions = async (roleName: stri
 
         const policyVersion = await getPolicyVersion(policyArn);
         const policyDocument = await getPolicyVersionDocument(policyArn);
+
+        console.log(policyDocument);
         
         policyName = policyVersion.Policy.PolicyName;
         const explicitlyDefinedDocument = await explicitlyDefineWildcardPermissions(policyDocument, policyName);
