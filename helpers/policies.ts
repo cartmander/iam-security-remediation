@@ -1,5 +1,5 @@
 import { CreatePolicyVersionCommand, DeletePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListPolicyVersionsCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
-import { OverPermissiveRolesMessage, PolicyType } from "../enums/enumTypes.js";
+import { OverPermissiveRolesMessage, PolicyType } from "../enums/types.js";
 import { client } from "../services/client.js";
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {

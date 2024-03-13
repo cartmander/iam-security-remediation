@@ -1,7 +1,7 @@
 import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged, getRoleTags } from "../../helpers/policies.js";
 import { generatePermissionsForService } from "../../helpers/serviceActions.js";
 import { buildRemediationCsv } from "../../helpers/misc.js";
-import { PolicyType, OverPermissiveRolesCsv, OverPermissiveRolesMessage } from "../../enums/enumTypes.js";
+import { PolicyType, OverPermissiveRolesCsv, OverPermissiveRolesMessage } from "../../enums/types.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
@@ -17,7 +17,7 @@ interface Statement {
     Resource: string;
 }
 
-const explicitlyDefineActionAsArray = (statement: Statement, actions: string[], explicitlyDefinedActions: string[]) => {
+const explicitlyDefineIfActionTypeIsArray = (statement: Statement, actions: string[], explicitlyDefinedActions: string[]) => {
     const wildcardExists: boolean = actions.some(action => action.includes(":*"));
     
     if (wildcardExists) {
@@ -37,7 +37,7 @@ const explicitlyDefineActionAsArray = (statement: Statement, actions: string[], 
     }
 }
 
-const explicitlyDefineActionAsString = (statement: Statement, actions: string, explicitlyDefinedActions: string[]) => {
+const explicitlyDefineIfActionTypeIsString = (statement: Statement, actions: string, explicitlyDefinedActions: string[]) => {
     const wildcardExists: boolean = actions.includes(":*");
 
     if (wildcardExists) {
@@ -62,11 +62,11 @@ const explicitlyDefineWildcardPermissions = async (policyDocument: BasePolicy, p
             let explicitlyDefinedActions: string[] = [];
 
             if (Array.isArray(actions)) {
-                explicitlyDefineActionAsArray(statement, actions, explicitlyDefinedActions);
+                explicitlyDefineIfActionTypeIsArray(statement, actions, explicitlyDefinedActions);
             }
 
             else {
-                explicitlyDefineActionAsString(statement, actions, explicitlyDefinedActions);
+                explicitlyDefineIfActionTypeIsString(statement, actions, explicitlyDefinedActions);
             }
         });
         
