@@ -63,6 +63,7 @@ export const generatePermissionsForService = (service: string): any => {
         case "ssm":
             return ssmPermissions;
         default:
+            console.log(`Unsupported AWS service: ${service}. Please include this in ./helpers/serviceActions.ts`);
             return;
     }
 }
