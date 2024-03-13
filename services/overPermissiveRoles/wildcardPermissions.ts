@@ -25,9 +25,13 @@ const explicitlyDefineIfActionTypeIsArray = (statement: Statement, actions: stri
             if (action.includes(":*")) {
                 const service: string = action.split(":")[0];
                 const servicePermissions: any = generatePermissionsForService(service);
-                
+
                 if (servicePermissions) {
                     explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions)
+                }
+                
+                else {
+                    explicitlyDefinedActions = explicitlyDefinedActions.concat(action);
                 }
             }
 
@@ -49,6 +53,10 @@ const explicitlyDefineIfActionTypeIsString = (statement: Statement, actions: str
 
         if (servicePermissions) {
             explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions)
+        }
+
+        else {
+            explicitlyDefinedActions = explicitlyDefinedActions.concat(actions);
         }
     }
 
