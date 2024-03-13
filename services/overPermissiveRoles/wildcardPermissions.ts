@@ -25,7 +25,10 @@ const explicitlyDefineIfActionTypeIsArray = (statement: Statement, actions: stri
             if (action.includes(":*")) {
                 const service: string = action.split(":")[0];
                 const servicePermissions: any = generatePermissionsForService(service);
-                servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+                
+                if (servicePermissions) {
+                    explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions)
+                }
             }
 
             else {
@@ -43,7 +46,10 @@ const explicitlyDefineIfActionTypeIsString = (statement: Statement, actions: str
     if (wildcardExists) {
         const service: string = actions.split(":")[0];
         const servicePermissions: any = generatePermissionsForService(service);
-        servicePermissions ? explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions) : console.error(`Unsupported service: ${service}`);
+
+        if (servicePermissions) {
+            explicitlyDefinedActions = explicitlyDefinedActions.concat(servicePermissions)
+        }
     }
 
     else {
