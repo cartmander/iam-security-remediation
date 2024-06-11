@@ -17,8 +17,9 @@ This automation remediates and resolves most audit issues related to overly-perm
 
 * Branch out from `main`.
 * Populate the `csvs/iamRoles.csv` with roles (please see column): `RoleName`.
-* Deploy the workflow: `Deploy AWS Managed Policies Remediation` - this transforms detected AWS managed policies into Customer inline policies and proceeds with the deletion of the AWS managed policies.
-* Deploy the workflow: `Deploy Wildcard Permissions Remediation` - this expounds the detected wildcard permissions by explicitly defining the permissions of a service. This only works with Customer managed and inline policies.
+* Go to GitHub Actions and then select a workflow. Make sure to choose the branch that you created.
+  * Deploy the workflow: `Deploy AWS Managed Policies Remediation` - this transforms detected AWS managed policies into Customer inline policies and proceeds with the deletion of the AWS managed policies.
+  * Deploy the workflow: `Deploy Wildcard Permissions Remediation` - this expounds the detected wildcard permissions by explicitly defining the permissions of a service. This only works with Customer managed and inline policies.
 * Results will be available to be downloaded after the workflow is finished running.
 
 
