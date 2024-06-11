@@ -1,0 +1,59 @@
+name: Deploy AWS Managed Policies Remediation
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_profile:
+        required: true
+        type: string
+        description: "AWS Profile"
+      aws_assumed_role_arn:
+        required: true
+        type: string
+        description: "AWS Role"
+      region:
+        required: true
+        type: string
+        description: "AWS Region"
+
+    
+jobs:
+    prepare:
+      runs-on: npr-common-8gb
+      steps:
+        - name: 🐙 Checkout code
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ inputs.branch_ref }}
+
+        - name: 🔥 Setup NodeJS
+          uses: actions/setup-node@v4
+          with:
+            registry-url: "https://npm.pkg.github.com"
+            always-auth: true
+            node-version: 20
+
+        - name: 🔑 Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-region: ${{ inputs.aws_region }}
+            role-to-assume: ${{ inputs.aws_assumed_role_arn }}
+            role-duration-seconds: 3600
+            role-skip-session-tagging: true
+
+        - name: 🔧 Install Packages and TypeScript
+          working-directory: ./
+          run: npm ci && npm install -g typescript
+
+    deploy:
+      runs-on: npr-common-4gb
+      steps:
+        - name: Remediate AWS Managed Policies
+          working-directory: ./
+          run: npm run aws-managed-policies
+        
+        - name: Upload Results
+          uses: actions/upload-artifact@v2
+          with:
+            name: awsManagedPolicies.csv
+            path: results/overPermissiveRoles/awsManagedPolicies.csv
