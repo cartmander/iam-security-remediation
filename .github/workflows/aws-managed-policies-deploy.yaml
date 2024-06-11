@@ -11,10 +11,9 @@ on:
         required: true
         type: string
         description: "AWS Region"
-
     
 jobs:
-    prepare:
+    deploy:
       runs-on: npr-common-8gb
       steps:
         - name: 🐙 Checkout code
@@ -41,14 +40,11 @@ jobs:
           working-directory: ./
           run: npm ci && npm install -g typescript
 
-    deploy:
-      runs-on: npr-common-4gb
-      steps:
-        - name: Remediate AWS Managed Policies
+        - name: 👷🏻‍♂️ Remediate AWS Managed Policies
           working-directory: ./
           run: npm run aws-managed-policies
         
-        - name: Upload Results
+        - name: ☁ Upload Results
           uses: actions/upload-artifact@v2
           with:
             name: awsManagedPolicies.csv
