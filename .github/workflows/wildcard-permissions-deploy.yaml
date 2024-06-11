@@ -1,4 +1,4 @@
-name: Deploy AWS Managed Policies Remediation
+name: Deploy Wildcard Permissions Remediation
 
 on:
   workflow_dispatch:
@@ -42,10 +42,10 @@ jobs:
 
         - name: 👷🏻‍♂️ Remediate AWS Managed Policies
           working-directory: ./
-          run: npm run wildcard-permissions
+          run: npm run aws-managed-policies
         
         - name: ☁ Upload Artifact
           uses: actions/upload-artifact@v2
           with:
-            name: Remediated AWS Managed Policies
-            path: results/overPermissiveRoles/awsManagedPolicies.csv
+            name: Remediated Wildcard Permissions
+            path: results/overPermissiveRoles/wildcardPermissions.csv
