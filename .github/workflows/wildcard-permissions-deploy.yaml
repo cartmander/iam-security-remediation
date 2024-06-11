@@ -42,7 +42,7 @@ jobs:
 
         - name: 👷🏻‍♂️ Remediate AWS Managed Policies
           working-directory: ./
-          run: npm run aws-managed-policies
+          run: npm run wildcard-permissions
         
         - name: ☁ Upload Artifact
           uses: actions/upload-artifact@v2
