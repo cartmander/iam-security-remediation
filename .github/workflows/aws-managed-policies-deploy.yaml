@@ -3,15 +3,11 @@ name: Deploy AWS Managed Policies Remediation
 on:
   workflow_dispatch:
     inputs:
-      aws_profile:
-        required: true
-        type: string
-        description: "AWS Profile"
       aws_assumed_role_arn:
         required: true
         type: string
         description: "AWS Role"
-      region:
+      aws_region:
         required: true
         type: string
         description: "AWS Region"
