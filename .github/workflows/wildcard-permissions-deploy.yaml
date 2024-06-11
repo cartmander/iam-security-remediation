@@ -40,7 +40,7 @@ jobs:
           working-directory: ./
           run: npm ci && npm install -g typescript
 
-        - name: 👷🏻‍♂️ Remediate AWS Managed Policies
+        - name: 👷🏻‍♂️ Remediate Wildcard Permissions
           working-directory: ./
           run: npm run wildcard-permissions
         
