@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This automation remediates and resolves most audit issues related to overly-permissive roles.
+This automation remediates and resolves most audit issues related to overly-permissive roles. 
 
 ## Scope
 
@@ -12,6 +12,7 @@ This automation remediates and resolves most audit issues related to overly-perm
 ## Limitation
 
 * **Explicitly defined permissions of services are hardcoded** - Though we're able to expound permissions with wildcard, it is only possible because we have explicitly defined the permissions of selected AWS services in this automation. Go to `helpers/serviceAction.ts`, see the list of AWS services that are being supported by this automation. If we encounter a wildcard permission that is not included in the list yet, it is not going to be processed by the automation. Contact the repo owner to include the AWS service in the list (or append the AWS service in `helpers/serviceAction.ts` and create a pull request).
+* **Solely focused on Overly-permissive roles** - For now, the automation is focused on remediating audit issues related to overly-permissive roles. Future enhancements are being considered.
 
 ## How To Use
 
