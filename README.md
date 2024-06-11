@@ -10,13 +10,9 @@ This automation remediates and resolves most audit issues related to overly-perm
 ## Limitation
 - **Explicitly defined permissions of services are hardcoded** - Though we're able to expound permissions with wildcard, it is only possible because we have explicitly defined the permissions of selected AWS services in this automation. Go to ```helpers/serviceAction.ts```, see the list of AWS services that are being supported by this automation. If we encounter a wildcard permission that is not included in the list yet, it is not going to be processed by the automation. Contact the repo owner to include the AWS service in the list (or append the AWS service in ```helpers/serviceAction.ts``` and create a pull request).
 
-## Future Capabilities
-- **Implement a workflow** - TBA
-
 ## How To Use
 - Branch out from ```main```.
 - Populate the ```csvs/iamRoles.csv``` with roles (please see column): ```RoleName```.
-- ```export AWS_PROFILE=<AWS_ACCOUNT>.<ROLE> ``` - set your AWS profile.
-- ```npm run aws-managed-policies``` - this transforms detected AWS managed policies into Customer inline policies and proceeds with the deletion of the AWS managed policies.
-- ```npm run wildcard-permissions``` - this expounds the detected wildcard permissions by explicitly defining the permissions of a service. This only works with Customer managed and inline policies.
-- Results would take effect in AWS and are are shown in CSV format located in ```results/overPermissiveRoles```.
+- Deploy the workflow: ```Deploy AWS Managed Policies Remediation``` - this transforms detected AWS managed policies into Customer inline policies and proceeds with the deletion of the AWS managed policies.
+- Deploy the workflow: ```Deploy Wildcard Permissions Remediation``` - this expounds the detected wildcard permissions by explicitly defining the permissions of a service. This only works with Customer managed and inline policies.
+- Results will be available to be downloaded after the workflow is finish running.
