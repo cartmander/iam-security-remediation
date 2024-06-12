@@ -10,8 +10,8 @@ export enum OverPermissiveRolesCsv {
 }
 
 export enum OverPermissiveRolesMessage {
-    NO_AWS_MANAGED = "No AWS Managed Policies attached",
-    NO_CUSTOMER_MANAGED = "No Customer Managed Policies attached",
+    NO_AWS_MANAGED = "No AWS Managed Policies attached to Role",
+    NO_CUSTOMER_MANAGED = "No Customer Managed Policies attached to Role",
     NO_INLINE = "No Inline Policies attached",
     NO_ERROR = "No errors found",
     NO_TAG = "No Platform tag found"

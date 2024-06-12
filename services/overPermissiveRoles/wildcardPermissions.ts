@@ -175,7 +175,7 @@ const processCustomerManagedPermissionsRemediation = async (roleName: string): P
         }
 
         else {
-            console.log(`No Customer Managed Policies attached to Role ${roleName}`);
+            console.log(`${OverPermissiveRolesMessage.NO_CUSTOMER_MANAGED} ${roleName}`);
         }
     }
 
