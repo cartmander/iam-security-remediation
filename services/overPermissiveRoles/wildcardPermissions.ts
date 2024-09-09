@@ -249,4 +249,4 @@ const main = async (csvPath: string) => {
     await parse(csvContent, csvOptions, loopCsvRecords);
 }
   
-main("csvs/iamRoles.csv");
+main("csvs/overPermissiveRoles.csv");

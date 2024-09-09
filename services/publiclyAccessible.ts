@@ -45,4 +45,4 @@ const main = async (csvPath: string) => {
     await parse(csvContent, csvOptions, loopCsvRecords);
 }
   
-main("csvs/apiGateways.csv");
+main("csvs/publiclyAccessible.csv");
