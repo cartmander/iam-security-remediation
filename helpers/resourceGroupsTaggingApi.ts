@@ -1,4 +1,4 @@
-import { resourceGroupsTaggingApiClient } from "./../services/client.js";
+import { resourceGroupsTaggingApiClient } from "./client.js";
 import { TagResourcesCommand } from "@aws-sdk/client-resource-groups-tagging-api";
 
 export const tagResources = async (resourceArns: string[], justification: string) => {

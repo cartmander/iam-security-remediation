@@ -1,7 +1,7 @@
-import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged, getRoleTags } from "../../helpers/policies.js";
-import { generatePermissionsForService } from "../../helpers/serviceActions.js";
-import { buildRemediationCsv } from "../../helpers/misc.js";
-import { PolicyType, OverPermissiveRolesCsv, OverPermissiveRolesMessage } from "../../enums/generic.js";
+import { getInlinePoliciesByRoleName, getRolePolicyDocument, createPolicyDocumentInRoleAsInline, getManagedPoliciesByRoleName, getPolicyVersion, getPolicyVersionDocument, createPolicyVersionInRoleAsCustomerManaged, getRoleTags } from "../helpers/policies.js";
+import { generatePermissionsForService } from "../helpers/serviceActions.js";
+import { buildRemediationCsv } from "../helpers/misc.js";
+import { PolicyType, OverPermissiveRolesCsv, OverPermissiveRolesMessage } from "../enums/generic.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
