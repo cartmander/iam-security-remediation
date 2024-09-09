@@ -6,12 +6,14 @@
   "main": "index.js",
   "scripts": {
     "aws-managed-policies": "tsc && node dist/services/overPermissiveRoles/awsManagedPolicies.js",
-    "wildcard-permissions": "tsc && node dist/services/overPermissiveRoles/wildcardPermissions.js"
+    "wildcard-permissions": "tsc && node dist/services/overPermissiveRoles/wildcardPermissions.js",
+    "publicly-accessible": "tsc && node dist/services/publiclyAccessible.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-iam": "^3.359.0",
+    "@aws-sdk/client-resource-groups-tagging-api": "^3.645.0",
     "@types/node": "^20.4.0",
     "csv-parse": "^5.4.0"
   }

@@ -1,6 +1,6 @@
 import { CreatePolicyVersionCommand, DeletePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListPolicyVersionsCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
 import { OverPermissiveRolesMessage, PolicyType } from "../enums/generic.js";
-import { client } from "../services/client.js";
+import { iamClient } from "../services/client.js";
 
 const isAWSManagedPolicy = (policyArn: string): boolean => {
     return policyArn.startsWith("arn:aws:iam::aws:policy/");
@@ -13,7 +13,7 @@ const listPolicyVersions = async (policyArn: string): Promise<any> => {
         }
 
         const command = new ListPolicyVersionsCommand(listPolicyVersionsCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
 
         return response.Versions;
     }
@@ -32,7 +32,7 @@ const deletePolicyVersion = async (policyArn: string, versionId: string): Promis
         }
 
         const command = new DeletePolicyVersionCommand(deletePolicyVersionCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
 
         console.log(response);
 
@@ -52,7 +52,7 @@ export const getPolicyVersion = async (policyArn: string) : Promise<any> => {
         }
 
         const command = new GetPolicyCommand(getPolicyCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
 
         return response;
     }
@@ -74,7 +74,7 @@ export const getPolicyVersionDocument = async (policyArn: string): Promise<any> 
         }
 
         const command = new GetPolicyVersionCommand(getPolicyVersionCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
         
         const policyDocument = JSON.parse(decodeURIComponent(response.PolicyVersion?.Document!));
 
@@ -95,7 +95,7 @@ export const getRolePolicyDocument = async (roleName: string, policyName: string
         }
 
         const command = new GetRolePolicyCommand(getRolePolicyCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
 
         const policyDocument = JSON.parse(decodeURIComponent(response.PolicyDocument!));
 
@@ -117,7 +117,7 @@ export const createPolicyDocumentInRoleAsInline = async (policyDocument: string,
         }
 
         const command = new PutRolePolicyCommand(putRolePolicyCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
         
         return response;
     }
@@ -137,7 +137,7 @@ export const createPolicyVersionInRoleAsCustomerManaged = async (policyDocument:
         }
         
         const command = new CreatePolicyVersionCommand(createPolicyVersionCommand);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
         
         return response;
     }
@@ -156,7 +156,7 @@ export const deleteAWSManagedPolicyInRole = async (roleName: string, policyName:
         }
 
         const command = new DetachRolePolicyCommand(deleteRolePolicyCommandinput);
-        await client.send(command);
+        await iamClient.send(command);
     }
 
     catch (error) {
@@ -174,7 +174,7 @@ export const getManagedPoliciesByRoleName = async (roleName: string, managedPoli
         };
 
         const command = new ListAttachedRolePoliciesCommand(listAttachedRolePoliciesCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
         
         const attachedPolicies = response.AttachedPolicies!;
 
@@ -205,7 +205,7 @@ export const getInlinePoliciesByRoleName = async (roleName: string): Promise<any
         };
 
         const command = new ListRolePoliciesCommand(listAttachedRolePoliciesCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
 
         const inlinePolicies = response.PolicyNames;
 
@@ -225,7 +225,7 @@ export const getRoleTags = async (roleName: string): Promise<any> => {
         }
 
         const command = new ListRoleTagsCommand(listRoleTagsCommandInput);
-        const response = await client.send(command);
+        const response = await iamClient.send(command);
         
         let platformTag;
         const platformExists = response.Tags?.find(tag => tag.Key === "PLATFORM");
