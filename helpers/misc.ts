@@ -24,3 +24,12 @@ export const buildRemediationCsv = (roleName: string, policy: string, policyType
         return;
     }
 }
+
+export const getRegionFromArn = (arn: string): string  => {
+    const parts = arn.split(':');
+    return parts.length > 3 ? parts[3] : "";
+}
+
+export const isAWSManagedPolicy = (policyArn: string): boolean => {
+    return policyArn.startsWith("arn:aws:iam::aws:policy/");
+}

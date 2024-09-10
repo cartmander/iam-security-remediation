@@ -1,10 +1,11 @@
 import { CreatePolicyVersionCommand, DeletePolicyVersionCommand, DetachRolePolicyCommand, GetPolicyCommand, GetPolicyVersionCommand, GetRolePolicyCommand, ListAttachedRolePoliciesCommand, ListPolicyVersionsCommand, ListRolePoliciesCommand, ListRoleTagsCommand, PutRolePolicyCommand } from "@aws-sdk/client-iam";
+import { IAMClient } from "@aws-sdk/client-iam";
 import { OverPermissiveRolesMessage, PolicyType } from "../enums/generic.js";
-import { iamClient } from "./client.js";
+import { isAWSManagedPolicy } from "./misc.js";
 
-const isAWSManagedPolicy = (policyArn: string): boolean => {
-    return policyArn.startsWith("arn:aws:iam::aws:policy/");
-}
+const iamClient = new IAMClient({
+    region: "us-east-1"
+});
 
 const listPolicyVersions = async (policyArn: string): Promise<any> => {
     try {

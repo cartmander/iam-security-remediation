@@ -1,12 +1,15 @@
 import { tagResources } from "../helpers/resourceGroupsTaggingApi.js";
+import { getRegionFromArn } from "../helpers/misc.js";
 import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
+
 const processPubliclyAccessibleRemediation = async (resources: string, justification: string): Promise<void> => {
     try {
         const arrayResources = [resources];
-        await tagResources(arrayResources, justification);
+        const region = getRegionFromArn(resources);
+        await tagResources(arrayResources, justification, region);
     }
 
     catch (error) {
